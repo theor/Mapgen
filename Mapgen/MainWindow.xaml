@@ -11,6 +11,13 @@
         TextOptions.TextRenderingMode="Auto"
         Background="{DynamicResource MaterialDesignPaper}"
         FontFamily="{DynamicResource MaterialDesignFont}">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.TextBox.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition />
@@ -32,6 +39,7 @@
             <Button Grid.Column="0" Name="btnMakePoints" Click="btnMakePoints_Click"  Content="Random" IsDefault="True"/>
             <Button Grid.Column="1" Name="btnFindDelaunay" Click="btnFindDelaunay_Click"  Content="Delaunay" />
             <Button Grid.Column="2" Name="btnFindVoronoi" Click="btnFindVoronoi_Click"  Content="Voronoi" />
+            <TextBox Grid.Column="3" Text="{Binding NumberOfVertices}" />
             <!--<TextBox ></TextBox>-->
             <TextBlock Grid.Column="6" Name="txtBlkTimer" Text="0.000s" 
                        HorizontalAlignment="Center" VerticalAlignment="Center"/>

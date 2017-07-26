@@ -33,39 +33,40 @@ namespace Mapgen
     /// </summary>
     public class Cell : TriangulationCell<Vertex, Cell>
     {
-        static Random rnd = new Random();
+        private static Random s_Rnd = new Random();
 
         public Brush Brush { get; private set; }
 
         public class FaceVisual : Shape
         {
-            Cell f;
+            private Cell _f;
 
-            Geometry geometry;
+            private Geometry _geometry;
             protected override Geometry DefiningGeometry
             {
                 get
                 {
-                    if (geometry != null) return geometry;
+                    if (_geometry != null) return _geometry;
 
-                    var myPathGeometry = new PathGeometry() { };
+                    var myPathGeometry = new PathGeometry();
                     var pathFigure1 = new PathFigure
                     {
-                        StartPoint = new Point(f.Vertices[0].Position[0], f.Vertices[0].Position[1])
+                        StartPoint = new Point(_f.Vertices[0].Position[0], _f.Vertices[0].Position[1])
                     };
                     for (int i = 1; i < 3; i++)
                     {
                         pathFigure1.Segments.Add(
                             new LineSegment(
-                                new Point(f.Vertices[i].Position[0],
-                                          f.Vertices[i].Position[1]), true) { IsSmoothJoin = true });
+                                new Point(_f.Vertices[i].Position[0],
+                                          _f.Vertices[i].Position[1]), true)
+                            { IsSmoothJoin = true });
                     }
                     pathFigure1.IsClosed = true;
                     myPathGeometry.Figures.Add(pathFigure1);
 
-                    Fill = f.Brush;
-                    geometry = myPathGeometry;
-                    return geometry;
+                    Fill = _f.Brush;
+                    _geometry = myPathGeometry;
+                    return _geometry;
                 }
             }
 
@@ -74,19 +75,19 @@ namespace Mapgen
                 Stroke = Brushes.Black;
                 StrokeThickness = 1.0;
                 Opacity = 0.3;
-                this.f = f;
+                _f = f;
 
-                var fill = new SolidColorBrush(Color.FromRgb((byte)rnd.Next(255), (byte)rnd.Next(255), (byte)rnd.Next(255)));
+                var fill = new SolidColorBrush(Color.FromRgb((byte)s_Rnd.Next(255), (byte)s_Rnd.Next(255), (byte)s_Rnd.Next(255)));
                 f.Brush = fill;
             }
         }
 
-        double Det(double[,] m)
+        private static double Det(double[,] m)
         {
-            return m[0, 0] * ((m[1, 1] * m[2, 2]) - (m[2, 1] * m[1, 2])) - m[0, 1] * (m[1, 0] * m[2, 2] - m[2, 0] * m[1, 2]) + m[0, 2] * (m[1, 0] * m[2, 1] - m[2, 0] * m[1, 1]);
+            return m[0, 0] * (m[1, 1] * m[2, 2] - m[2, 1] * m[1, 2]) - m[0, 1] * (m[1, 0] * m[2, 2] - m[2, 0] * m[1, 2]) + m[0, 2] * (m[1, 0] * m[2, 1] - m[2, 0] * m[1, 1]);
         }
 
-        double LengthSquared(double[] v)
+        private static double LengthSquared(double[] v)
         {
             double norm = 0;
             for (int i = 0; i < v.Length; i++)
@@ -97,7 +98,7 @@ namespace Mapgen
             return norm;
         }
 
-        Point GetCircumcenter()
+        private Point GetCircumcenter()
         {
             // From MathWorld: http://mathworld.wolfram.com/Circumcircle.html
 
@@ -133,42 +134,42 @@ namespace Mapgen
             {
                 m[i, 2] = points[i].Position[1];
             }
-            var c = -Det(m);
+            //var c = -Det(m);
 
             var s = -1.0 / (2.0 * a);
-            var r = System.Math.Abs(s) * System.Math.Sqrt(dx * dx + dy * dy - 4 * a * c);
+            //var r = Math.Abs(s) * Math.Sqrt(dx * dx + dy * dy - 4 * a * c);
             return new Point(s * dx, s * dy);
         }
 
-        Point GetCentroid()
+        private Point GetCentroid()
         {
             return new Point(Vertices.Select(v => v.Position[0]).Average(), Vertices.Select(v => v.Position[1]).Average());
         }
 
-        public Shape Visual { get; private set; }
-        Point? circumCenter;
+        public Shape Visual { get; }
+        private Point? _circumCenter;
         public Point Circumcenter
         {
             get
             {
-                circumCenter = circumCenter ?? GetCircumcenter();
-                return circumCenter.Value;
+                _circumCenter = _circumCenter ?? GetCircumcenter();
+                return _circumCenter.Value;
             }
         }
 
-        Point? centroid;
+        private Point? _centroid;
         public Point Centroid
         {
             get
             {
-                centroid = centroid ?? GetCentroid();
-                return centroid.Value;
+                _centroid = _centroid ?? GetCentroid();
+                return _centroid.Value;
             }
         }
 
         public Cell()
         {
             Visual = new FaceVisual(this);
-        }      
+        }
     }
 }
