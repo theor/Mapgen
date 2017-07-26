@@ -43,34 +43,6 @@ namespace Mapgen
             }
         }
 
-
-
-        void MakeGrid(int n, List<Vertex> vertices)
-        {
-            var sizeX = drawingCanvas.ActualWidth;
-            var sizeY = drawingCanvas.ActualHeight;
-            for (int i = 0; i < n; i++)
-            {
-                for (int j = 0; j < n; j++)
-                {
-                    var vi = new Vertex(i * sizeX / (n - 1), j * sizeY / (n - 1));
-                    vertices.Add(vi);
-                }
-            }
-        }
-
-        void MakeCircle(int n, List<Vertex> vertices)
-        {
-            var sizeX = drawingCanvas.ActualWidth;
-            var sizeY = drawingCanvas.ActualHeight;
-            for (int i = 0; i < n - 1; i++)
-            {
-                var x = 0.5 * sizeX + 0.38 * sizeX * Math.Cos(i * 2 * Math.PI / (n - 1));
-                var y = 0.5 * sizeY + 0.38 * sizeY * Math.Sin(i * 2 * Math.PI / (n - 1));
-                vertices.Add(new Vertex(x, y));
-            }
-        }
-
         void MakeRandom(int n, List<Vertex> vertices)
         {
             var r = new Random();
@@ -81,6 +53,8 @@ namespace Mapgen
                 var vi = new Vertex(sizeX * r.NextDouble(), sizeY * r.NextDouble());
                 vertices.Add(vi);
             }
+            btnFindDelaunay.IsEnabled = true;
+            btnFindVoronoi.IsEnabled = true;
         }
 
         void Create(List<Vertex> vertices)
@@ -113,33 +87,7 @@ namespace Mapgen
             Create(vs);
         }
 
-        private void btnMakeGrid_Click(object sender, RoutedEventArgs e)
-        {
-            var vs = new List<Vertex>();
-            MakeGrid(10, vs);
-            Create(vs);
-        }
-
-        private void btnMakeCircle_Click(object sender, RoutedEventArgs e)
-        {
-            var vs = new List<Vertex>();
-            MakeCircle(25, vs);
-            Create(vs);
-        }
-
-        private void btnMakeFancy_Click(object sender, RoutedEventArgs e)
-        {
-            var vs = new List<Vertex>();
-            MakeGrid(10, vs);
-            MakeCircle(25, vs);
-            Create(vs);
-        }
-
-        private void btnRelax_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
+      
         private void btnFindDelaunay_Click(object sender, RoutedEventArgs e)
         {
             drawingCanvas.Children.Clear();
@@ -153,19 +101,6 @@ namespace Mapgen
             }
 
             ShowVertices(Vertices);
-        }
-
-        static bool PointInCell(Cell c, Point p)
-        {
-            var v1 = c.Vertices[0].ToPoint();
-            var v2 = c.Vertices[1].ToPoint();
-            var v3 = c.Vertices[2].ToPoint();
-
-            var s0 = IsLeft(v1, v2, p);
-            var s1 = IsLeft(v2, v3, p);
-            var s2 = IsLeft(v3, v1, p);
-
-            return (s0 == s1) && (s1 == s2);
         }
 
         static int IsLeft(Point a, Point b, Point c)
