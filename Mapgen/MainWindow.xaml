@@ -40,6 +40,7 @@
             <Button Grid.Column="1" Name="btnFindDelaunay" Click="btnFindDelaunay_Click"  Content="Delaunay" />
             <Button Grid.Column="2" Name="btnFindVoronoi" Click="btnFindVoronoi_Click"  Content="Voronoi" />
             <TextBox Grid.Column="3" Text="{Binding NumberOfVertices}" />
+            <TextBox Grid.Column="4" Text="{Binding Freq}" />
             <!--<TextBox ></TextBox>-->
             <TextBlock Grid.Column="6" Name="txtBlkTimer" Text="0.000s" 
                        HorizontalAlignment="Center" VerticalAlignment="Center"/>

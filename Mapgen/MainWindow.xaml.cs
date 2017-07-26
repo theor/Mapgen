@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
@@ -79,15 +80,41 @@ namespace Mapgen
             btnFindDelaunay.IsEnabled = false;
             btnFindVoronoi.IsEnabled = true;
 
+            var p = new LibNoise.Perlin();
+            p.Seed = 42;
+            p.OctaveCount = 4;
+            p.Frequency = _vm.Freq;
+
+            //double min = 1;
+            //double max = 0;
             foreach (var cell in _vm.VoronoiMesh.Vertices)
             {
+                double value = (p.GetValue(cell.Centroid.X, cell.Centroid.Y, 0) + 1) / 2.0;
+                //if (value < min)
+                //{
+                //    min = value;
+                //    Trace.WriteLine($"min: {min}");
+                //}
+                //if (value > max)
+                //{
+                //    max = value;
+                //    Trace.WriteLine($"max: {max}");
+                //}
+                if (value < 0)
+                    value = 0;
+                if (value > 1)
+                    value = 1;
+                byte b = (byte) (value * 255); 
+                cell.Brush = new SolidColorBrush(Color.FromRgb(b,b,b));
                 drawingCanvas.Children.Add(cell.Visual);
             }
 
             _vm.ShowVertices(drawingCanvas.Children);
 
             foreach (var cell in _vm.VoronoiMesh.Vertices)
+            {
                 drawingCanvas.Children.Add(new Vertex(cell.Centroid.X, cell.Centroid.Y, Brushes.Cyan));
+            }
 
         }
 
@@ -109,12 +136,20 @@ namespace Mapgen
     {
         public List<Vertex> Vertices;
 
-        private int _numberOfVertices = 500;
+        private int _numberOfVertices = 1500;
         public int NumberOfVertices
         {
             get => _numberOfVertices;
             set { _numberOfVertices = value; OnPropertyChanged(); }
         }
+
+        public double Freq
+        {
+            get { return _freq; }
+            set { _freq = value; OnPropertyChanged(); }
+        }
+
+        private double _freq = 1;
 
         public VoronoiMesh<Vertex, Cell, VoronoiEdge<Vertex, Cell>> VoronoiMesh;
 

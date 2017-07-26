@@ -35,7 +35,7 @@ namespace Mapgen
     {
         private static Random s_Rnd = new Random();
 
-        public Brush Brush { get; private set; }
+        public Brush Brush { get; set; }
 
         public class FaceVisual : Shape
         {
@@ -72,9 +72,9 @@ namespace Mapgen
 
             public FaceVisual(Cell f)
             {
-                Stroke = Brushes.Black;
-                StrokeThickness = 1.0;
-                Opacity = 0.3;
+                Stroke = Brushes.Cyan;
+                StrokeThickness = 0.2;
+                Opacity = 1.0;
                 _f = f;
 
                 var fill = new SolidColorBrush(Color.FromRgb((byte)s_Rnd.Next(255), (byte)s_Rnd.Next(255), (byte)s_Rnd.Next(255)));
