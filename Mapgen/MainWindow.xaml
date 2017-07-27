@@ -4,6 +4,7 @@
         Title="2D Delaunay Trianglation and Voronoi Mesh Example"
         Width="600" Height="600"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:mapgen="clr-namespace:Mapgen"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         TextElement.FontWeight="Regular"
         TextElement.FontSize="13"
@@ -23,9 +24,9 @@
             <RowDefinition />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <Border Padding="20" Background="White">
+        <mapgen:ZoomBorder Padding="20" Background="White">
             <Canvas Margin="3" ClipToBounds="True" Name="drawingCanvas" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="White" />
-        </Border>
+        </mapgen:ZoomBorder>
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="25*"/>

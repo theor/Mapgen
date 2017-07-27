@@ -81,7 +81,7 @@ namespace Mapgen
             btnFindVoronoi.IsEnabled = true;
 
             var p = new LibNoise.Perlin();
-            p.Seed = 42;
+            p.Seed = 43;
             p.OctaveCount = 4;
             p.Frequency = _vm.Freq;
 
