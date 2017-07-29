@@ -25,6 +25,7 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Shapes;
 using MIConvexHull;
+using SkiaSharp;
 
 namespace Mapgen
 {
@@ -141,9 +142,9 @@ namespace Mapgen
             return new Point(s * dx, s * dy);
         }
 
-        private Point GetCentroid()
+        private SKPoint GetCentroid()
         {
-            return new Point(Vertices.Select(v => v.Position[0]).Average(), Vertices.Select(v => v.Position[1]).Average());
+            return new SKPoint((float) Vertices.Select(v => v.Position[0]).Average(), (float) Vertices.Select(v => v.Position[1]).Average());
         }
 
         public Shape Visual { get; }
@@ -157,8 +158,8 @@ namespace Mapgen
             }
         }
 
-        private Point? _centroid;
-        public Point Centroid
+        private SKPoint? _centroid;
+        public SKPoint Centroid
         {
             get
             {

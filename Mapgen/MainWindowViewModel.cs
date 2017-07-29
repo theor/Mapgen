@@ -11,6 +11,7 @@ using Mapgen.Annotations;
 using MIConvexHull;
 using SkiaSharp;
 using SkiaSharp.Views.Desktop;
+using SkiaSharp.Views.WPF;
 
 namespace Mapgen {
     public class MainWindowViewModel : INotifyPropertyChanged
@@ -154,6 +155,7 @@ namespace Mapgen {
                 _renderData.delaunayvertices = new SKPoint[cells.Count * 3];
 
                 _renderData.delaunayColors = new SKColor[cells.Count * 3];
+                _renderData.centroids = new SKPoint[cells.Count];
                 
                 Random r = new Random(42);
                 for (var index = 0; index < cells.Count; index++)
@@ -165,6 +167,7 @@ namespace Mapgen {
                     _renderData.delaunayColors[index * 3] = SKColor.FromHsl(r.Next(360), 75, 75);
                     _renderData.delaunayColors[index * 3 + 1] = _renderData.delaunayColors[index * 3];
                     _renderData.delaunayColors[index * 3 + 2] = _renderData.delaunayColors[index * 3];
+                    _renderData.centroids[index] = cell.Centroid;
                 }
                 ClearDirty(EDirty.Delaunay);
             }

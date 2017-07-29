@@ -11,6 +11,7 @@ namespace Mapgen {
         public SKPoint[] SkVertices = new SKPoint[0];
         public SKPoint[] delaunayvertices = new SKPoint[0];
         public SKColor[] delaunayColors = new SKColor[0];
+        public SKPoint[] centroids = new SKPoint[0];
 
         public void Render(object a, SKPaintSurfaceEventArgs args)
         {
@@ -41,6 +42,16 @@ namespace Mapgen {
             })
             {
                 c.DrawPoints(SKPointMode.Points, SkVertices, p);
+            }
+            using (var p = new SKPaint
+            {
+                Color = SKColors.Red,
+                IsStroke = true,
+                StrokeWidth = 2,
+                StrokeCap = SKStrokeCap.Round
+            })
+            {
+                c.DrawPoints(SKPointMode.Points, centroids, p);
             }
         }
     }
