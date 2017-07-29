@@ -71,7 +71,7 @@ namespace Mapgen {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        private MainWindow.RenderingData _renderData = new MainWindow.RenderingData();
+        private RenderingData _renderData = new RenderingData();
 
         public void MakeRandom(Size size)
         {
@@ -152,12 +152,19 @@ namespace Mapgen {
             {
                 var cells = (List<Cell>)VoronoiMesh.Vertices;
                 _renderData.delaunayvertices = new SKPoint[cells.Count * 3];
+
+                _renderData.delaunayColors = new SKColor[cells.Count * 3];
+                
+                Random r = new Random(42);
                 for (var index = 0; index < cells.Count; index++)
                 {
                     var cell = cells[index];
                     _renderData.delaunayvertices[index * 3] = cell.Vertices[0].ToSkPoint();
                     _renderData.delaunayvertices[index * 3 + 1] = cell.Vertices[1].ToSkPoint();
                     _renderData.delaunayvertices[index * 3 + 2] = cell.Vertices[2].ToSkPoint();
+                    _renderData.delaunayColors[index * 3] = SKColor.FromHsl(r.Next(360), 75, 75);
+                    _renderData.delaunayColors[index * 3 + 1] = _renderData.delaunayColors[index * 3];
+                    _renderData.delaunayColors[index * 3 + 2] = _renderData.delaunayColors[index * 3];
                 }
                 ClearDirty(EDirty.Delaunay);
             }
