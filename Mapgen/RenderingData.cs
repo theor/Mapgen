@@ -15,9 +15,9 @@ namespace Mapgen
         public SKPoint[] centroids = new SKPoint[0];
         public SKBitmap noiseBitmap;
 
-        public void Render(object a, SKPaintSurfaceEventArgs args, bool showVertices, bool showOutline, bool showCentroids, bool fillPolygons, bool showNoise)
+        public void Render(object a, SKPaintGLSurfaceEventArgs args, bool showVertices, bool showOutline, bool showCentroids, bool fillPolygons, bool showNoise)
         {
-            (float w, float h) = (args.Info.Width, args.Info.Height);
+            (float w, float h) = (args.RenderTarget.Width, args.RenderTarget.Height);
             var c = args.Surface.Canvas;
             c.Clear(SKColors.Black);
             //using (var p = new SKPaint { Color = SKColors.Red })
@@ -31,7 +31,7 @@ namespace Mapgen
                     c.DrawVertices(SKVertexMode.Triangles, delaunayvertices, delaunayColors, p);
                 else if (showNoise && noiseBitmap != null)
                 {
-                    c.DrawBitmap(noiseBitmap, args.Info.Rect);
+                    c.DrawBitmap(noiseBitmap, args.RenderTarget.Rect);
                 }
                 if (showOutline)
                     c.DrawVertices(SKVertexMode.Triangles, delaunayvertices, null, p);

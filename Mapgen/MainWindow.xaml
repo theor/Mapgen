@@ -25,7 +25,9 @@
             <ColumnDefinition />
             <ColumnDefinition Width="400" />
         </Grid.ColumnDefinitions>
-        <wpf:SKElement HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Name="skElement"/>
+
+        <WindowsFormsHost x:Name="glhost" Initialized="OnGLControlHost" Visibility="Visible" />
+        <!--<wpf:SKElement HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Name="skElement"/>-->
         <!--<mapgen:ZoomBorder Padding="20" Background="White">
             <Canvas Margin="3" ClipToBounds="True" Name="drawingCanvas" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="White" />
         </mapgen:ZoomBorder>-->

@@ -210,7 +210,7 @@ namespace Mapgen
             return (Point)((v1 + v2 + v3) / 3);
         }
 
-        public void Render(object sender, SKPaintSurfaceEventArgs e)
+        public void Render(object sender, SKPaintGLSurfaceEventArgs e)
         {
             if (IsDirtyClear(EDirty.Vertices))
             {
@@ -219,15 +219,15 @@ namespace Mapgen
             }
             if (IsDirtyClear(EDirty.ElevationNoise))
             {
-                _renderData.noiseBitmap = new SKBitmap(new SKImageInfo(e.Info.Width, e.Info.Height, SKColorType.Gray8, SKAlphaType.Opaque));
-                byte[] pixels = new byte[e.Info.Width * e.Info.Height];
+                _renderData.noiseBitmap = new SKBitmap(new SKImageInfo(e.RenderTarget.Width, e.RenderTarget.Height, SKColorType.Gray8, SKAlphaType.Opaque));
+                byte[] pixels = new byte[e.RenderTarget.Width * e.RenderTarget.Height];
                 var p = new LibNoise.Perlin();
                 p.Seed = 43;
                 p.OctaveCount = 4;
                 p.Frequency = Freq;
                 for (int i = 0; i < pixels.Length; i++)
                 {
-                    (int x, int y) = (i % e.Info.Width, i / e.Info.Width);
+                    (int x, int y) = (i % e.RenderTarget.Width, i / e.RenderTarget.Width);
                     double n = MainWindow.Clamp((p.GetValue(x, y, 0) + 1) / 2.0, 0, 1);
                     pixels[i] = (byte)(n * 255); ;
                 }

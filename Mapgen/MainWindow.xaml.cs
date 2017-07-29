@@ -5,9 +5,11 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows;
+using System.Windows.Forms.Integration;
 using System.Windows.Media;
 using MIConvexHull;
 using SkiaSharp;
+using SkiaSharp.Views.Desktop;
 
 #endregion
 
@@ -30,26 +32,29 @@ namespace Mapgen
         public float scale = 1;
         private Point initTranslation;
         public Vector translation;
+        private Size _size = new Size();
 
+        void repaint()
+        {
+            glhost.Child?.Invalidate();
+        }
         public MainWindow()
         {
             InitializeComponent();
 
             //btnFindDelaunay.IsEnabled = false;
             //btnFindVoronoi.IsEnabled = false;
-            
-            _vm = new MainWindowViewModel(() => skElement.InvalidateVisual());
+
+            _vm = new MainWindowViewModel(repaint);
             DataContext = _vm;
 
             Title += string.Format(" ({0} points)", _vm.NumberOfVertices);
-            skElement.PaintSurface += _vm.Render;
+            //skElement.PaintSurface += _vm.Render;
 
             this.MouseDown += (sender, args) =>
             {
                 _panning = true;
                 initTranslation = args.GetPosition(this) - translation;
-
-                skElement.InvalidateVisual();
             };
             this.MouseMove += (sender, args) =>
             {
@@ -69,7 +74,7 @@ namespace Mapgen
         private void RefreshMatrix()
         {
             _vm.RefreshMatrix(scale, translation);
-            skElement.InvalidateVisual();
+            repaint();
         }
 
         public static double Clamp(double v, double a, double b)
@@ -83,7 +88,7 @@ namespace Mapgen
 
         private void btnMakePoints_Click(object sender, RoutedEventArgs e)
         {
-            _vm.MakeRandom(new Size(skElement.CanvasSize.Width, skElement.CanvasSize.Height));
+            _vm.MakeRandom(_size);
             //btnFindDelaunay.IsEnabled = true;
             //btnFindVoronoi.IsEnabled = true;
             RefreshMatrix();
@@ -120,7 +125,28 @@ namespace Mapgen
         private void btnGenerateElevationNoise_Click(object sender, RoutedEventArgs e)
         {
             _vm.SetDirty(EDirty.ElevationNoise);
-            skElement.InvalidateVisual();
+            repaint();
+        }
+
+        private void OnGLControlHost(object sender, EventArgs e)
+        {
+            OpenTK.Toolkit.Init();
+            var glControl = new SKGLControl();
+            glControl.PaintSurface += (o, args) => _vm.Render(this, args);
+            glControl.Dock = System.Windows.Forms.DockStyle.Fill;
+            //glControl.Click += OnSampleClicked;
+            _size = new Size(glControl.CanvasSize.Width, glControl.CanvasSize.Height);
+            if(_size.Width == 0 || _size.Height == 0)
+                _size = new Size(800,800);
+            var host = (WindowsFormsHost)sender;
+
+            glControl.MouseWheel += (o, a) =>
+            {
+                scale = Clamp(scale * (a.Delta > 0 ? 1.05f : 0.95f), 0.1f, 100);
+                RefreshMatrix();
+            };
+
+            host.Child = glControl;
         }
     }
 
