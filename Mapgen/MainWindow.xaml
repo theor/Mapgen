@@ -23,31 +23,82 @@
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition />
-            <ColumnDefinition Width="200" />
+            <ColumnDefinition Width="400" />
         </Grid.ColumnDefinitions>
         <wpf:SKElement HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Name="skElement"/>
         <!--<mapgen:ZoomBorder Padding="20" Background="White">
             <Canvas Margin="3" ClipToBounds="True" Name="drawingCanvas" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="White" />
         </mapgen:ZoomBorder>-->
-        <Grid Grid.Column="1">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="25"/>
-                <RowDefinition Height="25"/>
-                <RowDefinition Height="25"/>
-                <RowDefinition Height="40"/>
-                <RowDefinition Height="40"/>
-                <RowDefinition Height="40"/>
-                <RowDefinition Height="25"/>
-            </Grid.RowDefinitions>
-            <Button Grid.Row="0" Name="btnMakePoints" Click="btnMakePoints_Click"  Content="Random" IsDefault="True"/>
-            <Button Grid.Row="1" Name="btnFindDelaunay" Click="btnFindDelaunay_Click"  Content="Delaunay" />
-            <Button Grid.Row="2" Name="btnFindVoronoi" Click="btnFindVoronoi_Click"  Content="Voronoi" />
-            <TextBox Grid.Row="3" Text="{Binding NumberOfVertices}" materialDesign:HintAssist.Hint="Vertex Count" Style="{StaticResource MaterialDesignFloatingHintTextBox}" />
-            <TextBox Grid.Row="4" Text="{Binding Freq}" materialDesign:HintAssist.Hint="Perlin Frequency" Style="{StaticResource MaterialDesignFloatingHintTextBox}" />
-            <TextBox Grid.Row="5" Text="{Binding Seed}" materialDesign:HintAssist.Hint="Perlin Seed" Style="{StaticResource MaterialDesignFloatingHintTextBox}" />
+
+        <StackPanel Grid.Column="1" >
+            <StackPanel.Resources>
+                <Style TargetType="{x:Type Button}" BasedOn="{StaticResource MaterialDesignFlatButton}">
+                    <Style.Setters>
+                        <Setter Property="Margin" Value="6 0"></Setter>
+                    </Style.Setters>
+                </Style>
+                <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource MaterialDesignFloatingHintTextBox}">
+                    <Style.Setters>
+                        <Setter Property="Margin" Value="6 0 6 2"></Setter>
+                    </Style.Setters>
+                </Style>
+                <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
+                    <Style.Setters>
+                        <Setter Property="Margin" Value="8 0 0 0"></Setter>
+                    </Style.Setters>
+                </Style>
+                <Style TargetType="{x:Type materialDesign:ColorZone}" BasedOn="{StaticResource {x:Type materialDesign:ColorZone}}">
+                    <Style.Setters>
+                        <Setter Property="Padding" Value="6"></Setter>
+                        <Setter Property="Mode" Value="PrimaryDark"></Setter>
+                    </Style.Setters>
+                </Style>
+                <Style TargetType="{x:Type materialDesign:Card}" BasedOn="{StaticResource {x:Type materialDesign:Card}}">
+                    <Style.Setters>
+                        <Setter Property="Margin" Value="4 4 4 0"></Setter>
+                        <!--<Setter Property="mode" Value="PrimaryDark"></Setter>-->
+                    </Style.Setters>
+                </Style>
+            </StackPanel.Resources>
+            
+            
+            <materialDesign:Card>
+                <StackPanel>
+                    <materialDesign:ColorZone>
+                        <TextBlock VerticalAlignment="Center">TOPOLOGY</TextBlock>
+                    </materialDesign:ColorZone>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition Width="2*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBox Text="{Binding Seed}" materialDesign:HintAssist.Hint="Vertex Seed" />
+                        <Slider Minimum="0" Maximum="100"
+                                Style="{StaticResource MaterialDesignDiscreteSlider}" 
+                                ToolTip="MaterialDesignDiscreteSlider"
+                                VerticalAlignment="Bottom"
+                                Value="{Binding Seed}"
+                                Grid.Column="1"/>
+                    </Grid>
+                    <TextBox  Text="{Binding NumberOfVertices}" materialDesign:HintAssist.Hint="Vertex Count" />
+                    <Button Content="Generate Vertices" Click="btnMakePoints_Click" IsDefault="True" />
+                </StackPanel>
+            </materialDesign:Card>
+
+            <materialDesign:Card>
+                <StackPanel>
+                    <materialDesign:ColorZone>
+                        <TextBlock VerticalAlignment="Center">ELEVATION</TextBlock>
+                    </materialDesign:ColorZone>
+                    <TextBox  Text="{Binding Freq}" materialDesign:HintAssist.Hint="Perlin Frequency"  />
+                    <Button Content="Generate Noise" Click="btnFindDelaunay_Click" />
+                    <Button Content="Voronoi" Click="btnFindVoronoi_Click" />
+                </StackPanel>
+            </materialDesign:Card>
             <!--<TextBox ></TextBox>-->
-            <TextBlock Grid.Row="6" Name="txtBlkTimer" Text="0.000s" 
+            <TextBlock Grid.Row="6" Name="txtBlkTimer" Text="0.000s" Margin="24"
                        HorizontalAlignment="Center" VerticalAlignment="Center"/>
-        </Grid>
+        </StackPanel>
     </Grid>
 </Window>
+

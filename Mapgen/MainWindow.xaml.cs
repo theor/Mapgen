@@ -36,8 +36,8 @@ namespace Mapgen
         {
             InitializeComponent();
 
-            btnFindDelaunay.IsEnabled = false;
-            btnFindVoronoi.IsEnabled = false;
+            //btnFindDelaunay.IsEnabled = false;
+            //btnFindVoronoi.IsEnabled = false;
             
             _vm = new MainWindowViewModel();
             DataContext = _vm;
@@ -81,8 +81,8 @@ namespace Mapgen
         private void btnMakePoints_Click(object sender, RoutedEventArgs e)
         {
             _vm.MakeRandom(new Size(skElement.CanvasSize.Width, skElement.CanvasSize.Height));
-            btnFindDelaunay.IsEnabled = true;
-            btnFindVoronoi.IsEnabled = true;
+            //btnFindDelaunay.IsEnabled = true;
+            //btnFindVoronoi.IsEnabled = true;
             RefreshMatrix();
         }
 
@@ -115,8 +115,8 @@ namespace Mapgen
         
         private void btnFindDelaunay_Click(object sender, RoutedEventArgs e)
         {
-            btnFindDelaunay.IsEnabled = false;
-            btnFindVoronoi.IsEnabled = true;
+            //btnFindDelaunay.IsEnabled = false;
+            //btnFindVoronoi.IsEnabled = true;
 
             _vm.ComputeDelaunay();
             //_vm.ShowVertices(drawingCanvas.Children);
@@ -131,8 +131,8 @@ namespace Mapgen
         private void btnFindVoronoi_Click(object sender, RoutedEventArgs e)
         {
             //drawingCanvas.Children.Clear();
-            btnFindVoronoi.IsEnabled = false;
-            btnFindDelaunay.IsEnabled = true;
+            //btnFindVoronoi.IsEnabled = false;
+            //btnFindDelaunay.IsEnabled = true;
 
             //var drawingCanvasChildren = drawingCanvas.Children;
             //_vm.ShowVoronoi(drawingCanvasChildren);
