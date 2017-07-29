@@ -4,23 +4,14 @@ using System.Windows.Shapes;
 namespace Mapgen
 {
     using MIConvexHull;
-    using System.Windows.Media;
+
     /// <summary>
     /// A vertex is a simple class that stores the postion of a point, node or vertex.
     /// </summary>
-    public class Vertex : Shape, IVertex
+    public class Vertex : IVertex
     {
-
-        protected override Geometry DefiningGeometry => new EllipseGeometry
+        public Vertex()
         {
-            Center = new Point(Position[0], Position[1]),
-            RadiusX = 1.5,
-            RadiusY = 1.5
-        };
-
-        public Vertex(Brush fill = null)
-        {
-            Fill = fill ?? Brushes.Red;
         }
 
         /// <summary>
@@ -28,9 +19,8 @@ namespace Mapgen
         /// </summary>
         /// <param name="x">The x position.</param>
         /// <param name="y">The y position.</param>
-        /// <param name="fill"></param>
-        public Vertex(double x, double y, Brush fill = null)
-            : this(fill)
+        public Vertex(double x, double y)
+            : this()
         {
             Position = new[] { x, y };
         }
@@ -39,12 +29,6 @@ namespace Mapgen
         {
             return new Point(Position[0], Position[1]);
         }
-
-        /// <summary>
-        /// Gets or sets the Z. Not used by MIConvexHull2D.
-        /// </summary>
-        /// <value>The Z position.</value>
-        // private double Z { get; set; }
 
         /// <summary>
         /// Gets or sets the coordinates.

@@ -13,11 +13,27 @@ using SkiaSharp;
 using SkiaSharp.Views.Desktop;
 using SkiaSharp.Views.WPF;
 
-namespace Mapgen {
+namespace Mapgen
+{
     public class MainWindowViewModel : INotifyPropertyChanged
     {
+        private readonly Action _triggerRender;
+        public MainWindowViewModel(Action triggerRender)
+        {
+            _triggerRender = triggerRender;
+        }
+
         private EDirty Dirty = EDirty.None;
 
+        public bool IsDirtyClear(EDirty d)
+        {
+            if (Dirty.HasFlag(d))
+            {
+                Dirty ^= d;
+                return true;
+            }
+            return false;
+        }
         public void SetDirty(EDirty d)
         {
             Dirty |= d;
@@ -31,7 +47,8 @@ namespace Mapgen {
         public List<Vertex> vertices
         {
             get => _vertices;
-            set {
+            set
+            {
                 _vertices = value;
                 SetDirty(EDirty.Vertices);
             }
@@ -55,10 +72,58 @@ namespace Mapgen {
         public int Seed
         {
             get { return _seed; }
-            set { _seed = value;
+            set
+            {
+                _seed = value;
                 OnPropertyChanged();
             }
         }
+
+        public bool ShowVertices
+        {
+            get { return _showVertices; }
+            set
+            {
+                _showVertices = value;
+                OnPropertyChanged();
+                _triggerRender();
+            }
+        }
+
+        public bool ShowCentroids
+        {
+            get { return _showCentroids; }
+            set
+            {
+                _showCentroids = value;
+                OnPropertyChanged();
+                _triggerRender();
+            }
+        }
+
+        public bool FillPolygons
+        {
+            get { return _fillPolygons; }
+            set
+            {
+                _fillPolygons = value;
+                OnPropertyChanged();
+                _triggerRender();
+            }
+        }
+
+        public bool ShowOutline
+        {
+            get { return _showOutline; }
+            set
+            {
+                _showOutline = value;
+                OnPropertyChanged();
+                _triggerRender();
+            }
+        }
+
+        public bool _showOutline = true;
 
 
         private VoronoiMesh<Vertex, Cell, VoronoiEdge<Vertex, Cell>> VoronoiMesh;
@@ -73,6 +138,9 @@ namespace Mapgen {
         }
 
         private RenderingData _renderData = new RenderingData();
+        private bool _showVertices;
+        private bool _showCentroids;
+        private bool _fillPolygons;
 
         public void MakeRandom(Size size)
         {
@@ -144,19 +212,39 @@ namespace Mapgen {
 
         public void Render(object sender, SKPaintSurfaceEventArgs e)
         {
-            if (Dirty.HasFlag(EDirty.Vertices))
+            if (IsDirtyClear(EDirty.Vertices))
             {
                 _renderData.SkVertices = vertices.Select(v => new SKPoint((float)v.Position[0], (float)v.Position[1])).ToArray();
                 ClearDirty(EDirty.Vertices);
             }
-            if (Dirty.HasFlag(EDirty.Delaunay))
+            if (IsDirtyClear(EDirty.ElevationNoise))
+            {
+                _renderData.noiseBitmap = new SKBitmap(new SKImageInfo(e.Info.Width, e.Info.Height, SKColorType.Gray8, SKAlphaType.Opaque));
+                byte[] pixels = new byte[e.Info.Width * e.Info.Height];
+                var p = new LibNoise.Perlin();
+                p.Seed = 43;
+                p.OctaveCount = 4;
+                p.Frequency = Freq;
+                for (int i = 0; i < pixels.Length; i++)
+                {
+                    (int x, int y) = (i % e.Info.Width, i / e.Info.Width);
+                    double n = MainWindow.Clamp((p.GetValue(x, y, 0) + 1) / 2.0, 0, 1);
+                    pixels[i] = (byte)(n * 255); ;
+                }
+                unsafe
+                {
+                    fixed (byte* pi = pixels)
+                        _renderData.noiseBitmap.SetPixels((IntPtr) pi);
+                }
+            }
+            if (IsDirtyClear(EDirty.Delaunay))
             {
                 var cells = (List<Cell>)VoronoiMesh.Vertices;
                 _renderData.delaunayvertices = new SKPoint[cells.Count * 3];
 
                 _renderData.delaunayColors = new SKColor[cells.Count * 3];
                 _renderData.centroids = new SKPoint[cells.Count];
-                
+
                 Random r = new Random(42);
                 for (var index = 0; index < cells.Count; index++)
                 {
@@ -169,9 +257,8 @@ namespace Mapgen {
                     _renderData.delaunayColors[index * 3 + 2] = _renderData.delaunayColors[index * 3];
                     _renderData.centroids[index] = cell.Centroid;
                 }
-                ClearDirty(EDirty.Delaunay);
             }
-            _renderData.Render(sender, e);
+            _renderData.Render(sender, e, ShowVertices, ShowOutline, ShowCentroids, FillPolygons, true);
         }
 
         internal void RefreshMatrix(float scale, Vector translation)
@@ -207,7 +294,7 @@ namespace Mapgen {
                 if (value > 1)
                     value = 1;
                 byte b = (byte)(value * 255);
-                cell.Brush = new SolidColorBrush(Color.FromRgb(b, b, b));
+                //cell.Brush = new SolidColorBrush(Color.FromRgb(b, b, b));
             }
             SetDirty(EDirty.Delaunay);
         }

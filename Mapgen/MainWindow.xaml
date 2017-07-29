@@ -81,6 +81,10 @@
                                 Grid.Column="1"/>
                     </Grid>
                     <TextBox  Text="{Binding NumberOfVertices}" materialDesign:HintAssist.Hint="Vertex Count" />
+                    <CheckBox IsChecked="{Binding ShowOutline}" Style="{StaticResource MaterialDesignCheckBox}">Show Outline</CheckBox>
+                    <CheckBox IsChecked="{Binding ShowVertices}" Style="{StaticResource MaterialDesignCheckBox}">Show Vertices</CheckBox>
+                    <CheckBox IsChecked="{Binding ShowCentroids}" Style="{StaticResource MaterialDesignCheckBox}">Show Centroids</CheckBox>
+                    <CheckBox IsChecked="{Binding FillPolygons}" Style="{StaticResource MaterialDesignCheckBox}">Fill Polygons</CheckBox>
                     <Button Content="Generate Vertices" Click="btnMakePoints_Click" IsDefault="True" />
                 </StackPanel>
             </materialDesign:Card>
@@ -91,8 +95,9 @@
                         <TextBlock VerticalAlignment="Center">ELEVATION</TextBlock>
                     </materialDesign:ColorZone>
                     <TextBox  Text="{Binding Freq}" materialDesign:HintAssist.Hint="Perlin Frequency"  />
-                    <Button Content="Generate Noise" Click="btnFindDelaunay_Click" />
-                    <Button Content="Voronoi" Click="btnFindVoronoi_Click" />
+                    <Button Content="Generate Noise" Click="btnGenerateElevationNoise_Click" />
+                    <!--<Button Content="Generate Noise" Click="btnFindDelaunay_Click" />-->
+                    <!--<Button Content="Voronoi" Click="btnFindVoronoi_Click" />-->
                 </StackPanel>
             </materialDesign:Card>
             <!--<TextBox ></TextBox>-->

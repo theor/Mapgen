@@ -38,7 +38,7 @@ namespace Mapgen
             //btnFindDelaunay.IsEnabled = false;
             //btnFindVoronoi.IsEnabled = false;
             
-            _vm = new MainWindowViewModel();
+            _vm = new MainWindowViewModel(() => skElement.InvalidateVisual());
             DataContext = _vm;
 
             Title += string.Format(" ({0} points)", _vm.NumberOfVertices);
@@ -72,7 +72,11 @@ namespace Mapgen
             skElement.InvalidateVisual();
         }
 
-        static float Clamp(float v, float a, float b)
+        public static double Clamp(double v, double a, double b)
+        {
+            return v < a ? a : (v > b ? b : v);
+        }
+        public static float Clamp(float v, float a, float b)
         {
             return v < a ? a : (v > b ? b : v);
         }
@@ -112,6 +116,12 @@ namespace Mapgen
             //_vm.ShowVertices(drawingCanvas.Children);
             //drawingCanvas.Children.Add(new Rectangle { Width = drawingCanvas.ActualWidth, Height = drawingCanvas.ActualHeight, Stroke = Brushes.Black, StrokeThickness = 3 });
         }
+
+        private void btnGenerateElevationNoise_Click(object sender, RoutedEventArgs e)
+        {
+            _vm.SetDirty(EDirty.ElevationNoise);
+            skElement.InvalidateVisual();
+        }
     }
 
     [Flags]
@@ -120,6 +130,7 @@ namespace Mapgen
         None = 0,
         Vertices = 1,
         Delaunay = 2,
+        ElevationNoise = 4,
     }
 
     static class Ext

@@ -19,10 +19,8 @@
  *     at https://designengrlab.github.io/MIConvexHull/
  *************************************************************************/
 
-using System;
 using System.Linq;
 using System.Windows;
-using System.Windows.Media;
 using System.Windows.Shapes;
 using MIConvexHull;
 using SkiaSharp;
@@ -34,55 +32,6 @@ namespace Mapgen
     /// </summary>
     public class Cell : TriangulationCell<Vertex, Cell>
     {
-        private static Random s_Rnd = new Random();
-
-        public Brush Brush { get; set; }
-
-        public class FaceVisual : Shape
-        {
-            private Cell _f;
-
-            private Geometry _geometry;
-            protected override Geometry DefiningGeometry
-            {
-                get
-                {
-                    if (_geometry != null) return _geometry;
-
-                    var myPathGeometry = new PathGeometry();
-                    var pathFigure1 = new PathFigure
-                    {
-                        StartPoint = new Point(_f.Vertices[0].Position[0], _f.Vertices[0].Position[1])
-                    };
-                    for (int i = 1; i < 3; i++)
-                    {
-                        pathFigure1.Segments.Add(
-                            new LineSegment(
-                                new Point(_f.Vertices[i].Position[0],
-                                          _f.Vertices[i].Position[1]), true)
-                            { IsSmoothJoin = true });
-                    }
-                    pathFigure1.IsClosed = true;
-                    myPathGeometry.Figures.Add(pathFigure1);
-
-                    Fill = _f.Brush;
-                    _geometry = myPathGeometry;
-                    return _geometry;
-                }
-            }
-
-            public FaceVisual(Cell f)
-            {
-                Stroke = Brushes.Cyan;
-                StrokeThickness = 0.2;
-                Opacity = 1.0;
-                _f = f;
-
-                var fill = new SolidColorBrush(Color.FromRgb((byte)s_Rnd.Next(255), (byte)s_Rnd.Next(255), (byte)s_Rnd.Next(255)));
-                f.Brush = fill;
-            }
-        }
-
         private static double Det(double[,] m)
         {
             return m[0, 0] * (m[1, 1] * m[2, 2] - m[2, 1] * m[1, 2]) - m[0, 1] * (m[1, 0] * m[2, 2] - m[2, 0] * m[1, 2]) + m[0, 2] * (m[1, 0] * m[2, 1] - m[2, 0] * m[1, 1]);
@@ -166,11 +115,6 @@ namespace Mapgen
                 _centroid = _centroid ?? GetCentroid();
                 return _centroid.Value;
             }
-        }
-
-        public Cell()
-        {
-            Visual = new FaceVisual(this);
         }
     }
 }

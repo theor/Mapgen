@@ -3,7 +3,8 @@ using System.Linq;
 using SkiaSharp;
 using SkiaSharp.Views.Desktop;
 
-namespace Mapgen {
+namespace Mapgen
+{
     public class RenderingData
     {
         public SKMatrix matrix = SKMatrix.MakeIdentity();
@@ -12,8 +13,9 @@ namespace Mapgen {
         public SKPoint[] delaunayvertices = new SKPoint[0];
         public SKColor[] delaunayColors = new SKColor[0];
         public SKPoint[] centroids = new SKPoint[0];
+        public SKBitmap noiseBitmap;
 
-        public void Render(object a, SKPaintSurfaceEventArgs args)
+        public void Render(object a, SKPaintSurfaceEventArgs args, bool showVertices, bool showOutline, bool showCentroids, bool fillPolygons, bool showNoise)
         {
             (float w, float h) = (args.Info.Width, args.Info.Height);
             var c = args.Surface.Canvas;
@@ -22,36 +24,31 @@ namespace Mapgen {
             //    c.DrawCircle(w / 2, h / 2, Math.Min(w / 2, h / 2), p);
             var f = 1.0 / Math.Min(w / 2, h / 2);
             c.SetMatrix(matrix);
-            using (var p = new SKPaint
+
+            using (var p = new SKPaint{Color = SKColors.DarkBlue,IsStroke = true,StrokeWidth = 0.7f,StrokeCap = SKStrokeCap.Round})
             {
-                Color = SKColors.DarkBlue,
-                IsStroke = true,
-                StrokeWidth = 0.7f,
-                StrokeCap = SKStrokeCap.Round
-            })
-            {
-                c.DrawVertices(SKVertexMode.Triangles, delaunayvertices, delaunayColors, p);
-                c.DrawVertices(SKVertexMode.Triangles, delaunayvertices, null, p);
+                if (fillPolygons)
+                    c.DrawVertices(SKVertexMode.Triangles, delaunayvertices, delaunayColors, p);
+                else if (showNoise && noiseBitmap != null)
+                {
+                    c.DrawBitmap(noiseBitmap, args.Info.Rect);
+                }
+                if (showOutline)
+                    c.DrawVertices(SKVertexMode.Triangles, delaunayvertices, null, p);
             }
-            using (var p = new SKPaint
+            if (showVertices)
             {
-                Color = SKColors.Cyan,
-                IsStroke = true,
-                StrokeWidth = 2,
-                StrokeCap = SKStrokeCap.Round
-            })
-            {
-                c.DrawPoints(SKPointMode.Points, SkVertices, p);
+                using (var p = new SKPaint{Color = SKColors.Cyan,IsStroke = true,StrokeWidth = 2,StrokeCap = SKStrokeCap.Round})
+                {
+                    c.DrawPoints(SKPointMode.Points, SkVertices, p);
+                }
             }
-            using (var p = new SKPaint
+            if (showCentroids)
             {
-                Color = SKColors.Red,
-                IsStroke = true,
-                StrokeWidth = 2,
-                StrokeCap = SKStrokeCap.Round
-            })
-            {
-                c.DrawPoints(SKPointMode.Points, centroids, p);
+                using (var p = new SKPaint { Color = SKColors.Red, IsStroke = true, StrokeWidth = 2, StrokeCap = SKStrokeCap.Round })
+                {
+                    c.DrawPoints(SKPointMode.Points, centroids, p);
+                }
             }
         }
     }
