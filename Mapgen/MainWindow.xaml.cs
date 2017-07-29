@@ -12,6 +12,8 @@ using System.Windows.Media;
 using System.Windows.Shapes;
 using Mapgen.Annotations;
 using MIConvexHull;
+using SkiaSharp;
+using SkiaSharp.Views.Desktop;
 
 #endregion
 
@@ -40,11 +42,19 @@ namespace Mapgen
             DataContext = _vm;
 
             Title += string.Format(" ({0} points)", _vm.NumberOfVertices);
+
+            skElement.PaintSurface += SkElementOnPaintSurface;
+        }
+
+        private void SkElementOnPaintSurface(object sender, SKPaintSurfaceEventArgs args)
+        {
+            using(var p = new SKPaint{Color = SKColors.Red})
+            args.Surface.Canvas.DrawCircle(args.Info.Width / 2, args.Info.Height / 2,Math.Min(args.Info.Width / 2, args.Info.Height / 2), p);
         }
 
         private void Create(List<Vertex> vertices)
         {
-            drawingCanvas.Children.Clear();
+            //drawingCanvas.Children.Clear();
 
             try
             {
@@ -59,7 +69,7 @@ namespace Mapgen
             txtBlkTimer.Text = string.Format("{0} faces", _vm.VoronoiMesh.Vertices.Count());
 
             _vm.Vertices = vertices;
-            _vm.ShowVertices(drawingCanvas.Children);
+            //_vm.ShowVertices(drawingCanvas.Children);
 
             btnFindDelaunay.IsEnabled = true;
             btnFindVoronoi.IsEnabled = true;
@@ -72,7 +82,9 @@ namespace Mapgen
             Create(vs);
         }
 
-      
+        public Canvas drawingCanvas { get; private set; }
+
+
         private void btnFindDelaunay_Click(object sender, RoutedEventArgs e)
         {
             drawingCanvas.Children.Clear();

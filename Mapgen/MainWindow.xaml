@@ -5,6 +5,7 @@
         Width="600" Height="600"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:mapgen="clr-namespace:Mapgen"
+        xmlns:wpf="clr-namespace:SkiaSharp.Views.WPF;assembly=SkiaSharp.Views.WPF"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         TextElement.FontWeight="Regular"
         TextElement.FontSize="13"
@@ -24,9 +25,10 @@
             <RowDefinition />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <mapgen:ZoomBorder Padding="20" Background="White">
+        <wpf:SKElement HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Name="skElement"/>
+        <!--<mapgen:ZoomBorder Padding="20" Background="White">
             <Canvas Margin="3" ClipToBounds="True" Name="drawingCanvas" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="White" />
-        </mapgen:ZoomBorder>
+        </mapgen:ZoomBorder>-->
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="25*"/>
