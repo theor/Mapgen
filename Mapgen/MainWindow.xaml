@@ -21,31 +21,32 @@
         </ResourceDictionary>
     </Window.Resources>
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+            <ColumnDefinition Width="200" />
+        </Grid.ColumnDefinitions>
         <wpf:SKElement HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Name="skElement"/>
         <!--<mapgen:ZoomBorder Padding="20" Background="White">
             <Canvas Margin="3" ClipToBounds="True" Name="drawingCanvas" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="White" />
         </mapgen:ZoomBorder>-->
-        <Grid Grid.Row="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="25*"/>
-                <ColumnDefinition Width="25*"/>
-                <ColumnDefinition Width="25*"/>
-                <ColumnDefinition Width="25*"/>
-                <ColumnDefinition Width="25*"/>
-                <ColumnDefinition Width="25*"/>
-                <ColumnDefinition Width="25*"/>
-            </Grid.ColumnDefinitions>
-            <Button Grid.Column="0" Name="btnMakePoints" Click="btnMakePoints_Click"  Content="Random" IsDefault="True"/>
-            <Button Grid.Column="1" Name="btnFindDelaunay" Click="btnFindDelaunay_Click"  Content="Delaunay" />
-            <Button Grid.Column="2" Name="btnFindVoronoi" Click="btnFindVoronoi_Click"  Content="Voronoi" />
-            <TextBox Grid.Column="3" Text="{Binding NumberOfVertices}" />
-            <TextBox Grid.Column="4" Text="{Binding Freq}" />
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="25"/>
+                <RowDefinition Height="25"/>
+                <RowDefinition Height="25"/>
+                <RowDefinition Height="40"/>
+                <RowDefinition Height="40"/>
+                <RowDefinition Height="40"/>
+                <RowDefinition Height="25"/>
+            </Grid.RowDefinitions>
+            <Button Grid.Row="0" Name="btnMakePoints" Click="btnMakePoints_Click"  Content="Random" IsDefault="True"/>
+            <Button Grid.Row="1" Name="btnFindDelaunay" Click="btnFindDelaunay_Click"  Content="Delaunay" />
+            <Button Grid.Row="2" Name="btnFindVoronoi" Click="btnFindVoronoi_Click"  Content="Voronoi" />
+            <TextBox Grid.Row="3" Text="{Binding NumberOfVertices}" materialDesign:HintAssist.Hint="Vertex Count" Style="{StaticResource MaterialDesignFloatingHintTextBox}" />
+            <TextBox Grid.Row="4" Text="{Binding Freq}" materialDesign:HintAssist.Hint="Perlin Frequency" Style="{StaticResource MaterialDesignFloatingHintTextBox}" />
+            <TextBox Grid.Row="5" Text="{Binding Seed}" materialDesign:HintAssist.Hint="Perlin Seed" Style="{StaticResource MaterialDesignFloatingHintTextBox}" />
             <!--<TextBox ></TextBox>-->
-            <TextBlock Grid.Column="6" Name="txtBlkTimer" Text="0.000s" 
+            <TextBlock Grid.Row="6" Name="txtBlkTimer" Text="0.000s" 
                        HorizontalAlignment="Center" VerticalAlignment="Center"/>
         </Grid>
     </Grid>
