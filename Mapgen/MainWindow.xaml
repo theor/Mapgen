@@ -98,6 +98,11 @@
                         <TextBlock VerticalAlignment="Center">ELEVATION</TextBlock>
                     </materialDesign:ColorZone>
                     <TextBox  Text="{Binding Freq}" materialDesign:HintAssist.Hint="Perlin Frequency"  />
+                    <Slider Minimum="0" Maximum="255"
+                            Style="{StaticResource MaterialDesignDiscreteSlider}" 
+                            ToolTip="Water level"
+                            VerticalAlignment="Bottom"
+                            Value="{Binding WaterLevel}" />
                     <Button Content="Generate Noise" Click="btnGenerateElevationNoise_Click" />
                     <!--<Button Content="Generate Noise" Click="btnFindDelaunay_Click" />-->
                     <!--<Button Content="Voronoi" Click="btnFindVoronoi_Click" />-->

@@ -158,6 +158,7 @@ namespace Mapgen
         Vertices = 1,
         Delaunay = 2,
         ElevationNoise = 4,
+        WaterLevel = 8,
     }
 
     static class Ext

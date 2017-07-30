@@ -95,8 +95,21 @@ namespace Mapgen
             set { _freq = value; OnPropertyChanged(); }
         }
 
+        public int _waterLevel;
+
         public RenderingOptions RenderingOptions { get; }
 
+        public int WaterLevel
+        {
+            get { return _waterLevel; }
+            set
+            {
+                _waterLevel = value;
+                OnPropertyChanged();
+                SetDirty(EDirty.WaterLevel);
+                _triggerRender();
+            }
+        }
 
         private VoronoiMesh<Vertex, Cell, VoronoiEdge<Vertex, Cell>> VoronoiMesh;
         private List<Vertex> _vertices;
@@ -214,8 +227,11 @@ namespace Mapgen
                     byte b = (byte) (n * 255);
                     _renderData.noiseColors[i * 3] = _renderData.noiseColors[i * 3 + 1] = _renderData.noiseColors[i * 3 + 2] =  new SKColor(b,b,b);
                 });
-
             }
+
+            if(IsDirtyClear(EDirty.WaterLevel))
+                _renderData.SetupNoiseColorFilter(WaterLevel);
+
             if (IsDirtyClear(EDirty.Delaunay))
             {
                 var cells = (List<Cell>)VoronoiMesh.Vertices;
@@ -237,6 +253,7 @@ namespace Mapgen
                     _renderData.centroids[index] = cell.Centroid;
                 }
             }
+
             _renderData.Render(sender, e, _size.Item1, _size.Item2, RenderingOptions);
         }
 
