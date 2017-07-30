@@ -51,24 +51,45 @@ namespace Mapgen
             Title += string.Format(" ({0} points)", _vm.NumberOfVertices);
             //skElement.PaintSurface += _vm.Render;
 
-            this.MouseDown += (sender, args) =>
-            {
-                _panning = true;
-                initTranslation = args.GetPosition(this) - translation;
-            };
-            this.MouseMove += (sender, args) =>
-            {
-                if (!_panning)
-                    return;
-                translation = args.GetPosition(this) - initTranslation;
-                RefreshMatrix();
-            };
-            this.MouseUp += (sender, args) => _panning = false;
+          
             this.MouseWheel += (_, a) =>
             {
                 scale = Clamp(scale * (a.Delta > 0 ? 1.05f : 0.95f), 0.1f, 100);
                 RefreshMatrix();
             };
+        }
+
+        private void OnGLControlHost(object esender, EventArgs e)
+        {
+            OpenTK.Toolkit.Init();
+            var glControl = new SKGLControl();
+            glControl.PaintSurface += (o, args) => _vm.Render(this, args);
+            glControl.Dock = System.Windows.Forms.DockStyle.Fill;
+            //glControl.Click += OnSampleClicked;
+            _size = new Size(glControl.CanvasSize.Width, glControl.CanvasSize.Height);
+            if(_size.Width == 0 || _size.Height == 0)
+                _size = new Size(800,800);
+            var host = (WindowsFormsHost)esender;
+            glControl.MouseDown += (sender, args) =>
+            {
+                _panning = true;
+                initTranslation = new Point(args.X, args.Y) - translation;
+            };
+            glControl.MouseMove += (sender, args) =>
+            {
+                if (!_panning)
+                    return;
+                translation = new Point(args.X, args.Y) - initTranslation;
+                RefreshMatrix();
+            };
+            glControl.MouseUp += (sender, args) => _panning = false;
+            glControl.MouseWheel += (o, a) =>
+            {
+                scale = Clamp(scale * (a.Delta > 0 ? 1.05f : 0.95f), 0.1f, 100);
+                RefreshMatrix();
+            };
+
+            host.Child = glControl;
         }
 
         private void RefreshMatrix()
@@ -81,6 +102,7 @@ namespace Mapgen
         {
             return v < a ? a : (v > b ? b : v);
         }
+
         public static float Clamp(float v, float a, float b)
         {
             return v < a ? a : (v > b ? b : v);
@@ -126,27 +148,6 @@ namespace Mapgen
         {
             _vm.SetDirty(EDirty.ElevationNoise);
             repaint();
-        }
-
-        private void OnGLControlHost(object sender, EventArgs e)
-        {
-            OpenTK.Toolkit.Init();
-            var glControl = new SKGLControl();
-            glControl.PaintSurface += (o, args) => _vm.Render(this, args);
-            glControl.Dock = System.Windows.Forms.DockStyle.Fill;
-            //glControl.Click += OnSampleClicked;
-            _size = new Size(glControl.CanvasSize.Width, glControl.CanvasSize.Height);
-            if(_size.Width == 0 || _size.Height == 0)
-                _size = new Size(800,800);
-            var host = (WindowsFormsHost)sender;
-
-            glControl.MouseWheel += (o, a) =>
-            {
-                scale = Clamp(scale * (a.Delta > 0 ? 1.05f : 0.95f), 0.1f, 100);
-                RefreshMatrix();
-            };
-
-            host.Child = glControl;
         }
     }
 

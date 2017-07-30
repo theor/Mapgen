@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -15,12 +16,24 @@ using SkiaSharp.Views.WPF;
 
 namespace Mapgen
 {
-    public class MainWindowViewModel : INotifyPropertyChanged
+    public class ViewModel : INotifyPropertyChanged
+    {
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        [NotifyPropertyChangedInvocator]
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+    }
+
+    public class MainWindowViewModel : ViewModel
     {
         private readonly Action _triggerRender;
         public MainWindowViewModel(Action triggerRender)
         {
             _triggerRender = triggerRender;
+            RenderingOptions = new RenderingOptions(triggerRender);
         }
 
         private EDirty Dirty = EDirty.None;
@@ -55,20 +68,15 @@ namespace Mapgen
         }
 
         private int _numberOfVertices = 1500;
+
         public int NumberOfVertices
         {
             get => _numberOfVertices;
             set { _numberOfVertices = value; OnPropertyChanged(); }
         }
 
-        private double _freq = 1;
-        public double Freq
-        {
-            get { return _freq; }
-            set { _freq = value; OnPropertyChanged(); }
-        }
-
         private int _seed = 42;
+
         public int Seed
         {
             get { return _seed; }
@@ -79,71 +87,27 @@ namespace Mapgen
             }
         }
 
-        public bool ShowVertices
+        private double _freq = 0.008;
+
+        public double Freq
         {
-            get { return _showVertices; }
-            set
-            {
-                _showVertices = value;
-                OnPropertyChanged();
-                _triggerRender();
-            }
+            get { return _freq; }
+            set { _freq = value; OnPropertyChanged(); }
         }
 
-        public bool ShowCentroids
-        {
-            get { return _showCentroids; }
-            set
-            {
-                _showCentroids = value;
-                OnPropertyChanged();
-                _triggerRender();
-            }
-        }
-
-        public bool FillPolygons
-        {
-            get { return _fillPolygons; }
-            set
-            {
-                _fillPolygons = value;
-                OnPropertyChanged();
-                _triggerRender();
-            }
-        }
-
-        public bool ShowOutline
-        {
-            get { return _showOutline; }
-            set
-            {
-                _showOutline = value;
-                OnPropertyChanged();
-                _triggerRender();
-            }
-        }
-
-        public bool _showOutline = true;
+        public RenderingOptions RenderingOptions { get; }
 
 
         private VoronoiMesh<Vertex, Cell, VoronoiEdge<Vertex, Cell>> VoronoiMesh;
         private List<Vertex> _vertices;
 
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        [NotifyPropertyChangedInvocator]
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
         private RenderingData _renderData = new RenderingData();
-        private bool _showVertices;
-        private bool _showCentroids;
-        private bool _fillPolygons;
+        private (int,int) _size;
+
 
         public void MakeRandom(Size size)
         {
+            _size = ((int, int)) (size.Width, size.Height);
             var r = new Random(Seed);
 
             vertices = new List<Vertex>(NumberOfVertices);
@@ -219,23 +183,38 @@ namespace Mapgen
             }
             if (IsDirtyClear(EDirty.ElevationNoise))
             {
-                _renderData.noiseBitmap = new SKBitmap(new SKImageInfo(e.RenderTarget.Width, e.RenderTarget.Height, SKColorType.Gray8, SKAlphaType.Opaque));
-                byte[] pixels = new byte[e.RenderTarget.Width * e.RenderTarget.Height];
+                _renderData.noiseBitmap = new SKBitmap(new SKImageInfo(_size.Item1, _size.Item2, SKColorType.Gray8, SKAlphaType.Opaque));
+                byte[] pixels = new byte[_size.Item1 * _size.Item2];
                 var p = new LibNoise.Perlin();
                 p.Seed = 43;
                 p.OctaveCount = 4;
                 p.Frequency = Freq;
-                for (int i = 0; i < pixels.Length; i++)
-                {
-                    (int x, int y) = (i % e.RenderTarget.Width, i / e.RenderTarget.Width);
-                    double n = MainWindow.Clamp((p.GetValue(x, y, 0) + 1) / 2.0, 0, 1);
-                    pixels[i] = (byte)(n * 255); ;
-                }
+                Parallel.For(0, pixels.Length, i =>
+                        //for (int i = 0; i < pixels.Length; i++)
+                    {
+                        (int x, int y) = (i % _size.Item2, i / _size.Item1);
+                        double n = MainWindow.Clamp((p.GetValue(x, y, 0) + 1) / 2.0, 0, 1);
+                        pixels[i] = (byte) (n * 255);
+                        ;
+                    }
+                );
+
                 unsafe
                 {
                     fixed (byte* pi = pixels)
-                        _renderData.noiseBitmap.SetPixels((IntPtr) pi);
+                        _renderData.noiseBitmap.SetPixels((IntPtr)pi);
                 }
+
+                var cells = (List<Cell>)VoronoiMesh.Vertices;
+                _renderData.noiseColors = new SKColor[cells.Count * 3];
+                Parallel.For(0, cells.Count, i =>
+                {
+                    (double x, double y) = (cells[i].Centroid.X, cells[i].Centroid.Y);
+                    double n = MainWindow.Clamp((p.GetValue(x, y, 0) + 1) / 2.0, 0, 1);
+                    byte b = (byte) (n * 255);
+                    _renderData.noiseColors[i * 3] = _renderData.noiseColors[i * 3 + 1] = _renderData.noiseColors[i * 3 + 2] =  new SKColor(b,b,b);
+                });
+
             }
             if (IsDirtyClear(EDirty.Delaunay))
             {
@@ -258,7 +237,7 @@ namespace Mapgen
                     _renderData.centroids[index] = cell.Centroid;
                 }
             }
-            _renderData.Render(sender, e, ShowVertices, ShowOutline, ShowCentroids, FillPolygons, true);
+            _renderData.Render(sender, e, _size.Item1, _size.Item2, RenderingOptions);
         }
 
         internal void RefreshMatrix(float scale, Vector translation)
@@ -297,6 +276,78 @@ namespace Mapgen
                 //cell.Brush = new SolidColorBrush(Color.FromRgb(b, b, b));
             }
             SetDirty(EDirty.Delaunay);
+        }
+    }
+
+    public class RenderingOptions : ViewModel
+    {
+        private bool _showVertices;
+        private bool _showCentroids;
+        private bool _fillPolygons;
+        public bool ShowVertices
+        {
+            get { return _showVertices; }
+            set
+            {
+                _showVertices = value;
+                OnPropertyChanged();
+                triggerRender();
+            }
+        }
+
+        public bool ShowCentroids
+        {
+            get { return _showCentroids; }
+            set
+            {
+                _showCentroids = value;
+                OnPropertyChanged();
+                triggerRender();
+            }
+        }
+
+        public bool FillPolygons
+        {
+            get { return _fillPolygons; }
+            set
+            {
+                _fillPolygons = value;
+                OnPropertyChanged();
+                triggerRender();
+            }
+        }
+
+        public bool ShowOutline
+        {
+            get { return _showOutline; }
+            set
+            {
+                _showOutline = value;
+                OnPropertyChanged();
+                triggerRender();
+            }
+        }
+
+        public bool ShowNoiseTexture
+        {
+            get { return _showNoiseTexture; }
+            set
+            {
+                _showNoiseTexture = value;
+                OnPropertyChanged();
+                triggerRender();
+            }
+        }
+
+        public bool FillNoisePolygons { get; set; } = true;
+
+        public bool _showOutline = true;
+        private Action triggerRender;
+        private bool _showNoiseTexture;
+
+        public RenderingOptions(Action triggerRender)
+        {
+            this.triggerRender = triggerRender;
         }
     }
 }

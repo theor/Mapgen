@@ -83,10 +83,11 @@
                                 Grid.Column="1"/>
                     </Grid>
                     <TextBox  Text="{Binding NumberOfVertices}" materialDesign:HintAssist.Hint="Vertex Count" />
-                    <CheckBox IsChecked="{Binding ShowOutline}" Style="{StaticResource MaterialDesignCheckBox}">Show Outline</CheckBox>
-                    <CheckBox IsChecked="{Binding ShowVertices}" Style="{StaticResource MaterialDesignCheckBox}">Show Vertices</CheckBox>
-                    <CheckBox IsChecked="{Binding ShowCentroids}" Style="{StaticResource MaterialDesignCheckBox}">Show Centroids</CheckBox>
-                    <CheckBox IsChecked="{Binding FillPolygons}" Style="{StaticResource MaterialDesignCheckBox}">Fill Polygons</CheckBox>
+                    <CheckBox IsChecked="{Binding RenderingOptions.ShowOutline}" Style="{StaticResource MaterialDesignCheckBox}">Show Outline</CheckBox>
+                    <CheckBox IsChecked="{Binding RenderingOptions.ShowVertices}" Style="{StaticResource MaterialDesignCheckBox}">Show Vertices</CheckBox>
+                    <CheckBox IsChecked="{Binding RenderingOptions.ShowCentroids}" Style="{StaticResource MaterialDesignCheckBox}">Show Centroids</CheckBox>
+                    <CheckBox IsChecked="{Binding RenderingOptions.FillPolygons}" Style="{StaticResource MaterialDesignCheckBox}">Fill Polygons</CheckBox>
+                    <CheckBox IsChecked="{Binding RenderingOptions.ShowNoiseTexture}" Style="{StaticResource MaterialDesignCheckBox}">Show Noise Texture</CheckBox>
                     <Button Content="Generate Vertices" Click="btnMakePoints_Click" IsDefault="True" />
                 </StackPanel>
             </materialDesign:Card>
