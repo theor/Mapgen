@@ -34,6 +34,7 @@ namespace Mapgen
         {
             _triggerRender = triggerRender;
             RenderingOptions = new RenderingOptions(triggerRender);
+            Elevation = new ElevationOptions(this, triggerRender);
         }
 
         private EDirty Dirty = EDirty.None;
@@ -75,47 +76,22 @@ namespace Mapgen
             set { _numberOfVertices = value; OnPropertyChanged(); }
         }
 
-        private int _seed = 42;
-
-        public int Seed
-        {
-            get { return _seed; }
-            set
-            {
-                _seed = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private double _freq = 0.008;
-
-        public double Freq
-        {
-            get { return _freq; }
-            set { _freq = value; OnPropertyChanged(); }
-        }
-
-        public int _waterLevel;
+        public int _seed = 42;
 
         public RenderingOptions RenderingOptions { get; }
-
-        public int WaterLevel
-        {
-            get { return _waterLevel; }
-            set
-            {
-                _waterLevel = value;
-                OnPropertyChanged();
-                SetDirty(EDirty.WaterLevel);
-                _triggerRender();
-            }
-        }
 
         private VoronoiMesh<Vertex, Cell, VoronoiEdge<Vertex, Cell>> VoronoiMesh;
         private List<Vertex> _vertices;
 
         private RenderingData _renderData = new RenderingData();
         private (int,int) _size;
+        public ElevationOptions Elevation { get; }
+
+        public int Seed
+        {
+            get { return _seed; }
+            set { _seed = value; OnPropertyChanged(); }
+        }
 
 
         public void MakeRandom(Size size)
@@ -199,9 +175,9 @@ namespace Mapgen
                 _renderData.noiseBitmap = new SKBitmap(new SKImageInfo(_size.Item1, _size.Item2, SKColorType.Gray8, SKAlphaType.Opaque));
                 byte[] pixels = new byte[_size.Item1 * _size.Item2];
                 var p = new LibNoise.Perlin();
-                p.Seed = 43;
-                p.OctaveCount = 4;
-                p.Frequency = Freq;
+                p.Seed = Elevation.Seed;
+                p.OctaveCount = Elevation.OctaveCount;
+                p.Frequency = Elevation.Freq;
                 Parallel.For(0, pixels.Length, i =>
                         //for (int i = 0; i < pixels.Length; i++)
                     {
@@ -230,7 +206,7 @@ namespace Mapgen
             }
 
             if(IsDirtyClear(EDirty.WaterLevel))
-                _renderData.SetupNoiseColorFilter(WaterLevel);
+                _renderData.SetupNoiseColorFilter(Elevation.WaterLevel);
 
             if (IsDirtyClear(EDirty.Delaunay))
             {
@@ -267,7 +243,7 @@ namespace Mapgen
             var p = new LibNoise.Perlin();
             p.Seed = 43;
             p.OctaveCount = 4;
-            p.Frequency = Freq;
+            p.Frequency = Elevation.Freq;
 
             //double min = 1;
             //double max = 0;
@@ -358,10 +334,22 @@ namespace Mapgen
 
         public bool FillNoisePolygons { get; set; } = true;
 
-        public bool _showOutline = true;
-        private Action triggerRender;
-        private bool _showNoiseTexture;
+        public bool FilterElevation
+        {
+            get { return _filterElevation; }
+            set
+            {
+                _filterElevation = value;
+                OnPropertyChanged();
+                triggerRender();
+            }
+        }
 
+        public bool _showOutline = true;
+        private bool _showNoiseTexture;
+        private bool _filterElevation;
+
+        private Action triggerRender;
         public RenderingOptions(Action triggerRender)
         {
             this.triggerRender = triggerRender;

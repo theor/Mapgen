@@ -33,7 +33,7 @@ namespace Mapgen
                 {
 
                     using (var p2 = new SKPaint { ColorFilter = _noiseColorFilter })
-                        c.DrawBitmap(noiseBitmap, new SKRect(0, 0, w, h), _noiseColorFilter == null ? null : p2);
+                        c.DrawBitmap(noiseBitmap, new SKRect(0, 0, w, h), _noiseColorFilter == null || !options.FilterElevation ? null : p2);
                 }
                 else if(options.FillNoisePolygons && noiseColors.Length == delaunayvertices.Length)
                     c.DrawVertices(SKVertexMode.Triangles, delaunayvertices, noiseColors, p);

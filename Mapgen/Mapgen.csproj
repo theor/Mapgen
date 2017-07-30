@@ -76,6 +76,7 @@
     <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ElevationOptions.cs" />
     <Compile Include="MainWindowViewModel.cs" />
     <Compile Include="MatrixHelper.cs" />
     <Compile Include="Properties\Annotations.cs" />

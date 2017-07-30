@@ -62,8 +62,8 @@
                     </Style.Setters>
                 </Style>
             </StackPanel.Resources>
-            
-            
+
+
             <materialDesign:Card>
                 <StackPanel>
                     <materialDesign:ColorZone>
@@ -87,7 +87,6 @@
                     <CheckBox IsChecked="{Binding RenderingOptions.ShowVertices}" Style="{StaticResource MaterialDesignCheckBox}">Show Vertices</CheckBox>
                     <CheckBox IsChecked="{Binding RenderingOptions.ShowCentroids}" Style="{StaticResource MaterialDesignCheckBox}">Show Centroids</CheckBox>
                     <CheckBox IsChecked="{Binding RenderingOptions.FillPolygons}" Style="{StaticResource MaterialDesignCheckBox}">Fill Polygons</CheckBox>
-                    <CheckBox IsChecked="{Binding RenderingOptions.ShowNoiseTexture}" Style="{StaticResource MaterialDesignCheckBox}">Show Noise Texture</CheckBox>
                     <Button Content="Generate Vertices" Click="btnMakePoints_Click" IsDefault="True" />
                 </StackPanel>
             </materialDesign:Card>
@@ -97,13 +96,44 @@
                     <materialDesign:ColorZone>
                         <TextBlock VerticalAlignment="Center">ELEVATION</TextBlock>
                     </materialDesign:ColorZone>
-                    <TextBox  Text="{Binding Freq}" materialDesign:HintAssist.Hint="Perlin Frequency"  />
-                    <Slider Minimum="0" Maximum="255"
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition></ColumnDefinition>
+                            <ColumnDefinition></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition></RowDefinition>
+                            <RowDefinition></RowDefinition>
+                            <RowDefinition></RowDefinition>
+                            <RowDefinition></RowDefinition>
+                            <RowDefinition></RowDefinition>
+                            <RowDefinition></RowDefinition>
+                        </Grid.RowDefinitions>
+                        <TextBox  Text="{Binding Elevation.Freq}" materialDesign:HintAssist.Hint="Perlin Frequency" Grid.ColumnSpan="2"  />
+                        <Label Grid.Row="1" Content="Water Level"/>
+                        <Slider Minimum="0" Maximum="255" Grid.Row="1" Grid.Column="1"
                             Style="{StaticResource MaterialDesignDiscreteSlider}" 
                             ToolTip="Water level"
                             VerticalAlignment="Bottom"
-                            Value="{Binding WaterLevel}" />
-                    <Button Content="Generate Noise" Click="btnGenerateElevationNoise_Click" />
+                            Value="{Binding Elevation.WaterLevel}" />
+
+                        <Label Grid.Row="2" Content="Octave Count"/>
+
+                        <Slider Minimum="1" Maximum="15" Grid.Row="2" Grid.Column="1"
+                            Style="{StaticResource MaterialDesignDiscreteSlider}" 
+                            ToolTip="OctaveCount"
+                            VerticalAlignment="Bottom"
+                            Value="{Binding Elevation.OctaveCount}"
+                            />
+
+                        <CheckBox IsChecked="{Binding RenderingOptions.ShowNoiseTexture}" Style="{StaticResource MaterialDesignCheckBox}"
+                                  Grid.Row="3" Grid.ColumnSpan="2">Show Noise Texture</CheckBox>
+                        <CheckBox IsChecked="{Binding RenderingOptions.FilterElevation}"
+                                  Style="{StaticResource MaterialDesignCheckBox}"
+                                  Grid.Row="4" Grid.ColumnSpan="2">FilterElevation Texture</CheckBox>
+                        <Button Content="Generate Noise" Click="btnGenerateElevationNoise_Click"
+                                Grid.Row="5" Grid.ColumnSpan="2"/>
+                    </Grid>
                     <!--<Button Content="Generate Noise" Click="btnFindDelaunay_Click" />-->
                     <!--<Button Content="Voronoi" Click="btnFindVoronoi_Click" />-->
                 </StackPanel>
