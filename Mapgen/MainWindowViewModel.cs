@@ -202,11 +202,26 @@ namespace Mapgen
                     double n = MainWindow.Clamp((p.GetValue(x, y, 0) + 1) / 2.0, 0, 1);
                     byte b = (byte) (n * 255);
                     _renderData.noiseColors[i * 3] = _renderData.noiseColors[i * 3 + 1] = _renderData.noiseColors[i * 3 + 2] =  new SKColor(b,b,b);
+                    cells[i].Elevation = (float) n;
                 });
             }
 
-            if(IsDirtyClear(EDirty.WaterLevel))
+            if (IsDirtyClear(EDirty.WaterLevel))
+            {
                 _renderData.SetupNoiseColorFilter(Elevation.WaterLevel);
+                foreach (VoronoiEdge<Vertex, Cell> edge in VoronoiMesh.Edges)
+                {
+
+                    if (edge.Source.Elevation <= Elevation.WaterLevel && edge.Target.Elevation >= Elevation.WaterLevel)
+                    {
+                        
+                    }
+                    if (edge.Target.Elevation <= Elevation.WaterLevel && edge.Source.Elevation >= Elevation.WaterLevel)
+                    {
+                        
+                    }
+                }
+            }
 
             if (IsDirtyClear(EDirty.Delaunay))
             {

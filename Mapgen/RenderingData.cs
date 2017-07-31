@@ -55,6 +55,7 @@ namespace Mapgen
                     c.DrawPoints(SKPointMode.Points, centroids, p);
                 }
             }
+            //c.DrawPath(new SKPath{Convexity = }, );
         }
 
         public void SetupNoiseColorFilter(int waterLevel)
@@ -67,6 +68,7 @@ namespace Mapgen
             if (_noiseColorFilter != null)
                 _noiseColorFilter.Dispose();
             _noiseColorFilter = SKColorFilter.CreateTable(bb);
+
         }
     }
 }

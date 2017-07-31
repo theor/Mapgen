@@ -116,5 +116,7 @@ namespace Mapgen
                 return _centroid.Value;
             }
         }
+
+        public float Elevation;
     }
 }
