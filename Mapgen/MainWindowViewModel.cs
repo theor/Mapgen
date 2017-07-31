@@ -204,6 +204,7 @@ namespace Mapgen
                     _renderData.noiseColors[i * 3] = _renderData.noiseColors[i * 3 + 1] = _renderData.noiseColors[i * 3 + 2] =  new SKColor(b,b,b);
                     cells[i].Elevation = (float) n;
                 });
+                SetDirty(EDirty.WaterLevel);
             }
 
             if (IsDirtyClear(EDirty.WaterLevel))
@@ -211,7 +212,6 @@ namespace Mapgen
                 _renderData.SetupNoiseColorFilter(Elevation.WaterLevel);
                 foreach (VoronoiEdge<Vertex, Cell> edge in VoronoiMesh.Edges)
                 {
-
                     if (edge.Source.Elevation <= Elevation.WaterLevel && edge.Target.Elevation >= Elevation.WaterLevel)
                     {
                         

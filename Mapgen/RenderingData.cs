@@ -17,7 +17,7 @@ namespace Mapgen
         public SKColor[] noiseColors = new SKColor[0];
         private SKColorFilter _noiseColorFilter;
 
-        public void Render(object a, SKPaintGLSurfaceEventArgs args, int w, int h,  RenderingOptions options)
+        public void Render(object a, SKPaintGLSurfaceEventArgs args, int w, int h, RenderingOptions options)
         {
             var c = args.Surface.Canvas;
             c.Clear(SKColors.Black);
@@ -25,24 +25,30 @@ namespace Mapgen
             //    c.DrawCircle(w / 2, h / 2, Math.Min(w / 2, h / 2), p);
             var f = 1.0 / Math.Min(w / 2, h / 2);
             c.SetMatrix(matrix);
-            using (var p = new SKPaint{Color = SKColors.DarkBlue,IsStroke = true,StrokeWidth = 0.7f,StrokeCap = SKStrokeCap.Round})
+            using (var p = new SKPaint { Color = SKColors.DarkBlue, IsStroke = true, StrokeWidth = 0.7f, StrokeCap = SKStrokeCap.Round })
             {
                 if (options.FillPolygons)
+                {
                     c.DrawVertices(SKVertexMode.Triangles, delaunayvertices, delaunayColors, p);
+                }
                 else if (options.ShowNoiseTexture && noiseBitmap != null)
                 {
 
                     using (var p2 = new SKPaint { ColorFilter = _noiseColorFilter })
                         c.DrawBitmap(noiseBitmap, new SKRect(0, 0, w, h), _noiseColorFilter == null || !options.FilterElevation ? null : p2);
                 }
-                else if(options.FillNoisePolygons && noiseColors.Length == delaunayvertices.Length)
-                    c.DrawVertices(SKVertexMode.Triangles, delaunayvertices, noiseColors, p);
+                else if (options.FillNoisePolygons && noiseColors.Length == delaunayvertices.Length)
+                {
+                    using (var p2 = new SKPaint { ColorFilter = _noiseColorFilter })
+                        c.DrawVertices(SKVertexMode.Triangles, delaunayvertices, noiseColors,
+                            _noiseColorFilter == null || !options.FilterElevation ? p : p2);
+                }
                 if (options.ShowOutline)
                     c.DrawVertices(SKVertexMode.Triangles, delaunayvertices, null, p);
             }
             if (options.ShowVertices)
             {
-                using (var p = new SKPaint{Color = SKColors.Cyan,IsStroke = true,StrokeWidth = 2})
+                using (var p = new SKPaint { Color = SKColors.Cyan, IsStroke = true, StrokeWidth = 2 })
                 {
                     c.DrawPoints(SKPointMode.Points, SkVertices, p);
 
@@ -63,7 +69,7 @@ namespace Mapgen
             byte[] bb = new byte[256];
             for (int i = 0; i < 256; i++)
             {
-                bb[i] = (byte) (i < waterLevel ? 0 : 255);
+                bb[i] = (byte)(i < waterLevel ? 0 : 255);
             }
             if (_noiseColorFilter != null)
                 _noiseColorFilter.Dispose();
