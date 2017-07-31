@@ -108,6 +108,7 @@
                             <RowDefinition></RowDefinition>
                             <RowDefinition></RowDefinition>
                             <RowDefinition></RowDefinition>
+                            <RowDefinition></RowDefinition>
                         </Grid.RowDefinitions>
                         <TextBox  Text="{Binding Elevation.Freq}" materialDesign:HintAssist.Hint="Perlin Frequency" Grid.ColumnSpan="2"  />
                         <Label Grid.Row="1" Content="Water Level"/>
@@ -131,8 +132,11 @@
                         <CheckBox IsChecked="{Binding RenderingOptions.FilterElevation}"
                                   Style="{StaticResource MaterialDesignCheckBox}"
                                   Grid.Row="4" Grid.ColumnSpan="2">FilterElevation Texture</CheckBox>
+                        <CheckBox IsChecked="{Binding RenderingOptions.ShowPolygonCoastline}"
+                                  Style="{StaticResource MaterialDesignCheckBox}"
+                                  Grid.Row="5" Grid.ColumnSpan="2">Show Polygon Coastline</CheckBox>
                         <Button Content="Generate Noise" Click="btnGenerateElevationNoise_Click"
-                                Grid.Row="5" Grid.ColumnSpan="2"/>
+                                Grid.Row="6" Grid.ColumnSpan="2"/>
                     </Grid>
                     <!--<Button Content="Generate Noise" Click="btnFindDelaunay_Click" />-->
                     <!--<Button Content="Voronoi" Click="btnFindVoronoi_Click" />-->

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
@@ -84,7 +85,7 @@ namespace Mapgen
         private List<Vertex> _vertices;
 
         private RenderingData _renderData = new RenderingData();
-        private (int,int) _size;
+        private (int, int) _size;
         public ElevationOptions Elevation { get; }
 
         public int Seed
@@ -96,7 +97,7 @@ namespace Mapgen
 
         public void MakeRandom(Size size)
         {
-            _size = ((int, int)) (size.Width, size.Height);
+            _size = ((int, int))(size.Width, size.Height);
             var r = new Random(Seed);
 
             vertices = new List<Vertex>(NumberOfVertices);
@@ -179,13 +180,13 @@ namespace Mapgen
                 p.OctaveCount = Elevation.OctaveCount;
                 p.Frequency = Elevation.Freq;
                 Parallel.For(0, pixels.Length, i =>
-                        //for (int i = 0; i < pixels.Length; i++)
-                    {
-                        (int x, int y) = (i % _size.Item2, i / _size.Item1);
-                        double n = MainWindow.Clamp((p.GetValue(x, y, 0) + 1) / 2.0, 0, 1);
-                        pixels[i] = (byte) (n * 255);
-                        ;
-                    }
+                //for (int i = 0; i < pixels.Length; i++)
+                {
+                    (int x, int y) = (i % _size.Item2, i / _size.Item1);
+                    double n = MainWindow.Clamp((p.GetValue(x, y, 0) + 1) / 2.0, 0, 1);
+                    pixels[i] = (byte)(n * 255);
+                    ;
+                }
                 );
 
                 unsafe
@@ -200,9 +201,9 @@ namespace Mapgen
                 {
                     (double x, double y) = (cells[i].Centroid.X, cells[i].Centroid.Y);
                     double n = MainWindow.Clamp((p.GetValue(x, y, 0) + 1) / 2.0, 0, 1);
-                    byte b = (byte) (n * 255);
-                    _renderData.noiseColors[i * 3] = _renderData.noiseColors[i * 3 + 1] = _renderData.noiseColors[i * 3 + 2] =  new SKColor(b,b,b);
-                    cells[i].Elevation = (float) n;
+                    byte b = (byte)(n * 255);
+                    _renderData.noiseColors[i * 3] = _renderData.noiseColors[i * 3 + 1] = _renderData.noiseColors[i * 3 + 2] = new SKColor(b, b, b);
+                    cells[i].Elevation = (float)(n * 255);
                 });
                 SetDirty(EDirty.WaterLevel);
             }
@@ -210,17 +211,27 @@ namespace Mapgen
             if (IsDirtyClear(EDirty.WaterLevel))
             {
                 _renderData.SetupNoiseColorFilter(Elevation.WaterLevel);
-                foreach (VoronoiEdge<Vertex, Cell> edge in VoronoiMesh.Edges)
+
+                var voronoiMeshEdges = (List<VoronoiEdge<Vertex, Cell>>)VoronoiMesh?.Edges;
+                List<SKPoint> outline = new List<SKPoint>();
+                for (var index = 0; index < voronoiMeshEdges?.Count; index++)
                 {
-                    if (edge.Source.Elevation <= Elevation.WaterLevel && edge.Target.Elevation >= Elevation.WaterLevel)
+                    VoronoiEdge<Vertex, Cell> edge = voronoiMeshEdges[index];
+
+                    if ((edge.Source.Elevation <= Elevation.WaterLevel &&
+                         edge.Target.Elevation > Elevation.WaterLevel) ||
+                        (edge.Target.Elevation <= Elevation.WaterLevel &&
+                         edge.Source.Elevation > Elevation.WaterLevel))
                     {
-                        
-                    }
-                    if (edge.Target.Elevation <= Elevation.WaterLevel && edge.Source.Elevation >= Elevation.WaterLevel)
-                    {
-                        
+                        var c = outline.Count;
+                        for (int i = 0; i < 3; i++)
+                            for (int j = 0; j < 3; j++)
+                                if (Ext.AboutEqual(edge.Source.Vertices[i], edge.Target.Vertices[j]))
+                                    outline.Add(edge.Source.Vertices[i].ToSkPoint());
+                        Debug.Assert(outline.Count == c + 2);
                     }
                 }
+                _renderData.outlineVertices = outline.ToArray();
             }
 
             if (IsDirtyClear(EDirty.Delaunay))
@@ -360,11 +371,24 @@ namespace Mapgen
             }
         }
 
+        public bool ShowPolygonCoastline
+        {
+            get { return _showPolygonCoastline; }
+            set
+            {
+                _showPolygonCoastline = value;
+                OnPropertyChanged();
+                triggerRender();
+            }
+        }
+
         public bool _showOutline = true;
         private bool _showNoiseTexture;
         private bool _filterElevation;
 
         private Action triggerRender;
+        private bool _showPolygonCoastline;
+
         public RenderingOptions(Action triggerRender)
         {
             this.triggerRender = triggerRender;

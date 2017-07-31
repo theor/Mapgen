@@ -118,5 +118,10 @@ namespace Mapgen
         }
 
         public float Elevation;
+
+        public override string ToString()
+        {
+            return $"{Centroid.X},{Centroid.Y}: {Elevation}";
+        }
     }
 }

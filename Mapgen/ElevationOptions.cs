@@ -5,7 +5,7 @@ namespace Mapgen {
         private MainWindowViewModel _mainWindowViewModel;
         private int _seed = 42;
         private double _freq = 0.008;
-        public int _waterLevel;
+        public int _waterLevel = 100;
 
         private Action triggerRender;
         private int _octaveCount = 4;

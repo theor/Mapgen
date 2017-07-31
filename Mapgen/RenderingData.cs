@@ -16,6 +16,7 @@ namespace Mapgen
         public SKBitmap noiseBitmap;
         public SKColor[] noiseColors = new SKColor[0];
         private SKColorFilter _noiseColorFilter;
+        public SKPoint[] outlineVertices = new SKPoint[0];
 
         public void Render(object a, SKPaintGLSurfaceEventArgs args, int w, int h, RenderingOptions options)
         {
@@ -46,20 +47,23 @@ namespace Mapgen
                 if (options.ShowOutline)
                     c.DrawVertices(SKVertexMode.Triangles, delaunayvertices, null, p);
             }
+
+            if (options.ShowPolygonCoastline)
+            {
+                using (var p = new SKPaint {Color = SKColors.Red, IsStroke = true, StrokeWidth = 4, IsAntialias = true})
+                    c.DrawPoints(SKPointMode.Lines, outlineVertices, p);
+            }
+
             if (options.ShowVertices)
             {
-                using (var p = new SKPaint { Color = SKColors.Cyan, IsStroke = true, StrokeWidth = 2 })
-                {
+                using (var p = new SKPaint {Color = SKColors.Cyan, IsStroke = true, StrokeWidth = 2})
                     c.DrawPoints(SKPointMode.Points, SkVertices, p);
-
-                }
             }
+
             if (options.ShowCentroids)
             {
-                using (var p = new SKPaint { Color = SKColors.Red, IsStroke = true, StrokeWidth = 2 })
-                {
+                using (var p = new SKPaint {Color = SKColors.Red, IsStroke = true, StrokeWidth = 2})
                     c.DrawPoints(SKPointMode.Points, centroids, p);
-                }
             }
             //c.DrawPath(new SKPath{Convexity = }, );
         }

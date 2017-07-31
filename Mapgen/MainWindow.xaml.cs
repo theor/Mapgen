@@ -167,5 +167,21 @@ namespace Mapgen
         {
             return new SKPoint((float)v.Position[0], (float)v.Position[1]);
         }
+
+        public static bool AboutEqual(double[] a, double[] b)
+        {
+            return AboutEqual(a[0], b[0]) && AboutEqual(a[1], b[1]);
+        }
+
+        public static bool AboutEqual(double x, double y)
+        {
+            double epsilon = Math.Max(Math.Abs(x), Math.Abs(y)) * 1E-15;
+            return Math.Abs(x - y) <= epsilon;
+        }
+
+        internal static bool AboutEqual(Vertex vertex1, Vertex vertex2)
+        {
+            return AboutEqual(vertex1.Position, vertex2.Position);
+        }
     }
 }
