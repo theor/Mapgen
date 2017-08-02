@@ -32,7 +32,8 @@
             <Canvas Margin="3" ClipToBounds="True" Name="drawingCanvas" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="White" />
         </mapgen:ZoomBorder>-->
 
-        <StackPanel Grid.Column="1" >
+        <ScrollViewer Grid.Column="1">
+            <StackPanel>
             <StackPanel.Resources>
                 <Style TargetType="{x:Type Button}" BasedOn="{StaticResource MaterialDesignFlatButton}">
                     <Style.Setters>
@@ -96,60 +97,56 @@
                     <materialDesign:ColorZone>
                         <TextBlock VerticalAlignment="Center">ELEVATION</TextBlock>
                     </materialDesign:ColorZone>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition></ColumnDefinition>
-                            <ColumnDefinition></ColumnDefinition>
-                        </Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions>
-                            <RowDefinition></RowDefinition>
-                            <RowDefinition></RowDefinition>
-                            <RowDefinition></RowDefinition>
-                            <RowDefinition></RowDefinition>
-                            <RowDefinition></RowDefinition>
-                            <RowDefinition></RowDefinition>
-                            <RowDefinition></RowDefinition>
-                            <RowDefinition></RowDefinition>
-                        </Grid.RowDefinitions>
+                    <StackPanel>
+              
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition />
+                                <ColumnDefinition Width="2*" />
+                            </Grid.ColumnDefinitions>
+                                <TextBox Text="{Binding Elevation.Seed}" materialDesign:HintAssist.Hint="Vertex Seed" />
+                            <Slider Minimum="0" Maximum="100"
+                                    Style="{StaticResource MaterialDesignDiscreteSlider}" 
+                                    ToolTip="MaterialDesignDiscreteSlider"
+                                    VerticalAlignment="Bottom"
+                                    Value="{Binding Elevation.Seed}"
+                                    Grid.Column="1"/>
+                        </Grid>
                         <TextBox  Text="{Binding Elevation.Freq}" materialDesign:HintAssist.Hint="Perlin Frequency" Grid.ColumnSpan="2"  />
-                        <Label Grid.Row="1" Content="Water Level"/>
-                        <Slider Minimum="0" Maximum="255" Grid.Row="1" Grid.Column="1"
-                            Style="{StaticResource MaterialDesignDiscreteSlider}" 
+                        <Label Content="Water Level"/>
+                        <Slider Minimum="0" Maximum="255"
+                                Style="{StaticResource MaterialDesignDiscreteSlider}" 
                             ToolTip="Water level"
                             VerticalAlignment="Bottom"
                             Value="{Binding Elevation.WaterLevel}" />
 
-                        <Label Grid.Row="2" Content="Octave Count"/>
+                        <Label Content="Octave Count"/>
 
-                        <Slider Minimum="1" Maximum="15" Grid.Row="2" Grid.Column="1"
-                            Style="{StaticResource MaterialDesignDiscreteSlider}" 
+                        <Slider Minimum="1" Maximum="15"
+                                Style="{StaticResource MaterialDesignDiscreteSlider}" 
                             ToolTip="OctaveCount"
                             VerticalAlignment="Bottom"
                             Value="{Binding Elevation.OctaveCount}"
                             />
 
-                        <CheckBox IsChecked="{Binding RenderingOptions.ShowNoiseTexture}" Style="{StaticResource MaterialDesignCheckBox}"
-                                  Grid.Row="3" Grid.ColumnSpan="2">Show Noise Texture</CheckBox>
+                        <CheckBox IsChecked="{Binding RenderingOptions.ShowNoiseTexture}" Style="{StaticResource MaterialDesignCheckBox}">Show Noise Texture</CheckBox>
                         <CheckBox IsChecked="{Binding RenderingOptions.FilterElevation}"
-                                  Style="{StaticResource MaterialDesignCheckBox}"
-                                  Grid.Row="4" Grid.ColumnSpan="2">FilterElevation Texture</CheckBox>
+                                  Style="{StaticResource MaterialDesignCheckBox}">FilterElevation Texture</CheckBox>
                         <CheckBox IsChecked="{Binding RenderingOptions.ShowPolygonCoastline}"
-                                  Style="{StaticResource MaterialDesignCheckBox}"
-                                  Grid.Row="5" Grid.ColumnSpan="2">Show Polygon Coastline</CheckBox>
+                                  Style="{StaticResource MaterialDesignCheckBox}">Show Polygon Coastline</CheckBox>
                         <CheckBox IsChecked="{Binding RenderingOptions.ShowPolygonCoastPath}"
-                                  Style="{StaticResource MaterialDesignCheckBox}"
-                                  Grid.Row="6" Grid.ColumnSpan="2">ShowPolygonCoastPath</CheckBox>
-                        <Button Content="Generate Noise" Click="btnGenerateElevationNoise_Click"
-                                Grid.Row="7" Grid.ColumnSpan="2"/>
-                    </Grid>
+                                  Style="{StaticResource MaterialDesignCheckBox}">ShowPolygonCoastPath</CheckBox>
+                        <Button Content="Generate Noise" Click="btnGenerateElevationNoise_Click" />
+                    </StackPanel>
                     <!--<Button Content="Generate Noise" Click="btnFindDelaunay_Click" />-->
                     <!--<Button Content="Voronoi" Click="btnFindVoronoi_Click" />-->
                 </StackPanel>
             </materialDesign:Card>
             <!--<TextBox ></TextBox>-->
-            <TextBlock Grid.Row="6" Name="txtBlkTimer" Text="0.000s" Margin="24"
+            <TextBlock Name="txtBlkTimer" Text="0.000s" Margin="24"
                        HorizontalAlignment="Center" VerticalAlignment="Center"/>
         </StackPanel>
+        </ScrollViewer>
     </Grid>
 </Window>
 
