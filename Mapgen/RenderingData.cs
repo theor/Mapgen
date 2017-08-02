@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using SkiaSharp;
 using SkiaSharp.Views.Desktop;
@@ -17,6 +18,7 @@ namespace Mapgen
         public SKColor[] noiseColors = new SKColor[0];
         private SKColorFilter _noiseColorFilter;
         public SKPoint[] outlineVertices = new SKPoint[0];
+        public List<SKPath> m_Paths = new List<SKPath>();
 
         public void Render(object a, SKPaintGLSurfaceEventArgs args, int w, int h, RenderingOptions options)
         {
@@ -50,19 +52,29 @@ namespace Mapgen
 
             if (options.ShowPolygonCoastline)
             {
-                using (var p = new SKPaint {Color = SKColors.Red, IsStroke = true, StrokeWidth = 4, IsAntialias = true})
+
+                using (var p = new SKPaint { Color = SKColors.Red, IsStroke = true, StrokeWidth = 4, IsAntialias = true })
                     c.DrawPoints(SKPointMode.Lines, outlineVertices, p);
+            }
+            else if (options.ShowPolygonCoastPath)
+            {
+                for (int i = 0; i < m_Paths.Count; i++)
+                {
+                    using (var p = new SKPaint { Color = SKColor.FromHsl((i + 1) * 255.0f / m_Paths.Count, 300, 255),
+                        IsStroke = true, StrokeWidth = 4, IsAntialias = true })
+                        c.DrawPath(m_Paths[i], p);
+                }
             }
 
             if (options.ShowVertices)
             {
-                using (var p = new SKPaint {Color = SKColors.Cyan, IsStroke = true, StrokeWidth = 2})
+                using (var p = new SKPaint { Color = SKColors.Cyan, IsStroke = true, StrokeWidth = 2 })
                     c.DrawPoints(SKPointMode.Points, SkVertices, p);
             }
 
             if (options.ShowCentroids)
             {
-                using (var p = new SKPaint {Color = SKColors.Red, IsStroke = true, StrokeWidth = 2})
+                using (var p = new SKPaint { Color = SKColors.Red, IsStroke = true, StrokeWidth = 2 })
                     c.DrawPoints(SKPointMode.Points, centroids, p);
             }
             //c.DrawPath(new SKPath{Convexity = }, );

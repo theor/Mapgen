@@ -179,6 +179,11 @@ namespace Mapgen
             return Math.Abs(x - y) <= epsilon;
         }
 
+        internal static bool AboutEqual(SKPoint vertex1, SKPoint vertex2)
+        {
+            return AboutEqual(vertex1.X, vertex2.X) && AboutEqual(vertex1.Y, vertex2.Y);
+        }
+
         internal static bool AboutEqual(Vertex vertex1, Vertex vertex2)
         {
             return AboutEqual(vertex1.Position, vertex2.Position);

@@ -69,7 +69,7 @@ namespace Mapgen
             }
         }
 
-        private int _numberOfVertices = 1500;
+        private int _numberOfVertices = 15;
 
         public int NumberOfVertices
         {
@@ -164,6 +164,18 @@ namespace Mapgen
             return (Point)((v1 + v2 + v3) / 3);
         }
 
+        struct HalfEdge
+        {
+            public readonly SKPoint Point;
+            public readonly int HalfId;
+
+            public HalfEdge(int halfId, SKPoint point)
+            {
+                Point = point;
+                HalfId = halfId;
+            }
+        }
+
         public void Render(object sender, SKPaintGLSurfaceEventArgs e)
         {
             if (IsDirtyClear(EDirty.Vertices))
@@ -214,6 +226,7 @@ namespace Mapgen
 
                 var voronoiMeshEdges = (List<VoronoiEdge<Vertex, Cell>>)VoronoiMesh?.Edges;
                 List<SKPoint> outline = new List<SKPoint>();
+                var dict = new Dictionary<int, HalfEdge>();
                 for (var index = 0; index < voronoiMeshEdges?.Count; index++)
                 {
                     VoronoiEdge<Vertex, Cell> edge = voronoiMeshEdges[index];
@@ -229,9 +242,49 @@ namespace Mapgen
                                 if (Ext.AboutEqual(edge.Source.Vertices[i], edge.Target.Vertices[j]))
                                     outline.Add(edge.Source.Vertices[i].ToSkPoint());
                         Debug.Assert(outline.Count == c + 2);
+                        var nextId = dict.Count + 1;
+                        dict.Add(nextId, new HalfEdge(nextId + 1, outline[outline.Count - 2]));
+                        dict.Add(nextId + 1, new HalfEdge(nextId, outline[outline.Count - 1]));
                     }
                 }
                 _renderData.outlineVertices = outline.ToArray();
+
+                _renderData.m_Paths.Clear();
+                while (dict.Count > 0)
+                {
+                    HalfEdge a = dict.First().Value;
+                    HalfEdge b = dict[a.HalfId];
+                    dict.Remove(a.HalfId);
+                    dict.Remove(b.HalfId);
+                    List<SKPoint> points = new List<SKPoint>();
+                    points.Add(a.Point);
+                    points.Add(b.Point);
+                    // in list: 1 segment
+                    var newA = dict.FirstOrDefault(x => Ext.AboutEqual(x.Value.Point, a.Point));
+                    while (newA.Key != default(int))
+                    {
+                        a = dict[newA.Value.HalfId];
+                        dict.Remove(a.HalfId);
+                        dict.Remove(newA.Value.HalfId);
+                        points.Insert(0, a.Point);
+                        newA = dict.FirstOrDefault(x => Ext.AboutEqual(x.Value.Point, a.Point));
+                    }
+
+                    var newB = dict.FirstOrDefault(x => Ext.AboutEqual(x.Value.Point, b.Point));
+                    while (newB.Key != default(int))
+                    {
+                        b = dict[newB.Value.HalfId];
+                        dict.Remove(b.HalfId);
+                        dict.Remove(newB.Value.HalfId);
+                        points.Add(b.Point);
+                        newB = dict.FirstOrDefault(x => Ext.AboutEqual(x.Value.Point, b.Point));
+                    }
+
+
+                    SKPath p = new SKPath();
+                    p.AddPoly(points.ToArray(), false);
+                    _renderData.m_Paths.Add(p);
+                }
             }
 
             if (IsDirtyClear(EDirty.Delaunay))
@@ -382,12 +435,22 @@ namespace Mapgen
             }
         }
 
+        public bool ShowPolygonCoastPath
+        {
+            get { return _showPolygonCoastPath; }
+            set { _showPolygonCoastPath = value;
+                OnPropertyChanged();
+                triggerRender();
+            }
+        }
+
         public bool _showOutline = true;
         private bool _showNoiseTexture;
         private bool _filterElevation;
 
         private Action triggerRender;
         private bool _showPolygonCoastline;
+        private bool _showPolygonCoastPath;
 
         public RenderingOptions(Action triggerRender)
         {
