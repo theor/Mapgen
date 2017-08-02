@@ -82,14 +82,25 @@ namespace Mapgen
 
         public void SetupNoiseColorFilter(int waterLevel)
         {
-            byte[] bb = new byte[256];
+            byte[] grey = new byte[256];
+            byte[] a = new byte[256];
+            byte[] r = new byte[256];
+            byte[] g = new byte[256];
+            byte[] b = new byte[256];
             for (int i = 0; i < 256; i++)
             {
-                bb[i] = (byte)(i < waterLevel ? 0 : 255);
+                grey[i] = (byte)(i < waterLevel ? 0 : 255);
+                a[i] = 255;
+                int aboveLvl = (255 * (i - waterLevel) / (255 - waterLevel));
+                r[i] = (byte) (i < waterLevel ? 0 : aboveLvl);
+                g[i] = (byte) (i < waterLevel ? 0 : 255);// (255 * (255 + i - waterLevel) / (255 - waterLevel)));
+                b[i] = (byte) (i >= waterLevel ? aboveLvl : (i / (float)waterLevel * 255));
+
             }
             if (_noiseColorFilter != null)
                 _noiseColorFilter.Dispose();
-            _noiseColorFilter = SKColorFilter.CreateTable(bb);
+            //_noiseColorFilter = SKColorFilter.CreateTable(grey);
+            _noiseColorFilter = SKColorFilter.CreateTable(a, r, g, b);
 
         }
     }
